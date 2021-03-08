@@ -1,0 +1,9 @@
+*.Rproj.user
+*.Rhistory
+*.RData
+*.Ruserdata
+*.html
+/raw_data
+/processed_data
+/scripts/rsconnect
+.Rproj.user
