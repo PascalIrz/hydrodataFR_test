@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pascal Irz" />
 
-<meta name="date" content="2021-03-08" />
+<meta name="date" content="2021-03-18" />
 
 <title>Package {hydrodataFR} - Introduction</title>
 
@@ -2887,18 +2887,38 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Package {hydrodataFR} - Introduction</h1>
 <h4 class="author">Pascal Irz</h4>
-<h4 class="date">2021-03-08</h4>
+<h4 class="date">2021-03-18</h4>
 
 
 
-<p>Les étapes de configuration de la machine et d’installation des packages sont considérées comme déjà réalisées.</p>
-<p>La présentation générale du <code>package {tod}</code> est disponible <a href="https://rpubs.com/kamoke/723467">ici</a>.</p>
-<p>Activation des <code>packages</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(tod)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span></code></pre></div>
+<div id="pourquoi-ce-package" class="section level1">
+<h1>Pourquoi ce package ?</h1>
+<p>Le <code>package {hydrodataFR}</code> propose une palette d’outils pour faciliter l’exploitation des données de la <a href="http://hydro.eaufrance.fr/">banque HYDRO</a>.</p>
+</div>
+<div id="installation" class="section level1">
+<h1>Installation</h1>
+<div id="configuration-r-et-rstudio" class="section level2">
+<h2>Configuration R et RStudio</h2>
+<p>Se reporter à la description donnée au début du <a href="https://rpubs.com/kamoke/713407">tuto sur l’importation des données avec le package {aspe}</a>.</p>
+</div>
+<div id="téléchargement-du-package" class="section level2">
+<h2>Téléchargement du package</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;pascalirz/hydrodataFR&quot;</span>)</span></code></pre></div>
+</div>
+<div id="activation-des-packages." class="section level2">
+<h2>Activation des <code>packages</code>.</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">library</span>(hydrodataFR)</span></code></pre></div>
+</div>
+</div>
 <div id="contenu" class="section level1">
 <h1>Contenu</h1>
-<p>Ces données sont mises à disposition par l’<a href="https://hubeau.eaufrance.fr/page/api-hydrometrie">API Hub’Eau - Hydrométrie</a>.</p>
+<p>Les données concernées sont :</p>
+<ul>
+<li>Les caractéristiques des stations hydrométriques, via le <a href="http://hydro.eaufrance.fr/">portail de la banque HYDRO</a>.</li>
+<li>Les synthèses statistiques par station hydrométrique, également via le <a href="http://hydro.eaufrance.fr/">portail de la banque HYDRO</a>.</li>
+<li>Les cotes et débits en temps réel, via l’<a href="https://hubeau.eaufrance.fr/page/api-hydrometrie">API hydrométrie</a>.</li>
+</ul>
 <p>Le référentiel associé est <a href="https://www.sandre.eaufrance.fr/notice-doc/r%C3%A9f%C3%A9rentiel-hydrom%C3%A9trique-3">disponible en ligne</a>.</p>
 <p>La plupart des données sont rattachées à un site ou à une station de mesure. La sélection des stations peut être opérée de diverses manières :</p>
 <ul>
@@ -2906,18 +2926,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Sélection géographique soit rectangulaire (<code>bbox</code>) soit circulaire (en indiquant les coordonnées du point central et un rayon)</li>
 <li>Parfois sur l’appartenance à une entité administrative identifiée par son <a href="https://www.data.gouv.fr/fr/datasets/code-officiel-geographique-cog/">Code Officiel Géographique (COG)</a>.</li>
 </ul>
-<p>L’API comprend plusieurs limitations :</p>
-<ul>
-<li>Elle ne permet pas de remonter au-delà d’un mois.</li>
-<li>Elle limite le téléchargement à 20 000 données par requête.</li>
-<li>Quand le téléchargement comporte plusieurs stations, le pas de temps <code>timestep</code> n’est plus activé donc on est contraints au pas de 10’ par défaut, et par conséquent à des chroniques avec 6 fois moins de longueur que si l’on avait <code>timestep = 60</code>.</li>
-</ul>
-<blockquote>
-<p>Il se peut aussi qu’au bout d’un moment un message d’erreur “HTTP error 502” ou “504” vous soit retourné.</p>
-</blockquote>
-<p><img src="data:image/png;base64,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" /></p>
-<p>Dans ce cas des codes erreurs dans la gamme des 500, c’est le serveur qui n’a pas réussi à traiter correctement votre requête ou que la connexion est mauvaise. <strong>Normalement en recommençant ça finit par passer</strong>.</p>
-<p>Les fonctions du <code>package</code> utilisées ici sont toutes préfixées <code>menv_bh</code> en référence au founrisseur de la donnée, le Ministère de l’Environnement (<code>menv</code>) et à la source, la banque HYDRO (<code>bh</code>).</p>
+<p>Les fonctions du <code>package</code> utilisées ici sont préfixées en référence à la source, par exemple <code>bh_</code> pour la banque HYDRO.</p>
 </div>
 <div id="caractéristiques-des-stations" class="section level1">
 <h1>Caractéristiques des stations</h1>
@@ -2927,41 +2936,41 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Coordonnées en WGS84 (EPSG:4326)</li>
 <li>Séparateur décimal</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>donnees_stations &lt;-<span class="st"> </span><span class="kw">menv_bh_sta_tod</span>(<span class="dt">bbox =</span> <span class="st">&quot;-7, 46, -3, 48&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>donnees_stations &lt;-<span class="st"> </span><span class="kw">bh_sta_data</span>(<span class="dt">bbox =</span> <span class="st">&quot;-7, 46, -3, 48&quot;</span>)</span></code></pre></div>
 <p>Autre exemple, si l’on s’intéresse aux stations de la région Bretagne (code Insee = 53) :</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>donnees_stations &lt;-<span class="st"> </span><span class="kw">menv_bh_sta_tod</span>(<span class="dt">code_region =</span> <span class="dv">53</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>donnees_stations &lt;-<span class="st"> </span><span class="kw">bh_sta_data</span>(<span class="dt">code_region =</span> <span class="dv">53</span>)</span></code></pre></div>
 <p>On obtient un tableau de 215 lignes et 35 colonnes nommées :</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">names</span>(donnees_stations)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;code_site&quot;                           &quot;libelle_site&quot;                       </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">#&gt;  [3] &quot;type_site&quot;                           &quot;coordonnee_x_site&quot;                  </span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;coordonnee_y_site&quot;                   &quot;code_projection&quot;                    </span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">#&gt;  [7] &quot;longitude_site&quot;                      &quot;latitude_site&quot;                      </span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;altitude_site&quot;                       &quot;code_systeme_alti_site&quot;             </span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co">#&gt; [11] &quot;surface_bv&quot;                          &quot;statut_site&quot;                        </span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;premier_mois_etiage_site&quot;            &quot;premier_mois_annee_hydro_site&quot;      </span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co">#&gt; [15] &quot;influence_generale_site&quot;             &quot;code_entite_hydro_site&quot;             </span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">#&gt; [17] &quot;code_troncon_hydro_site&quot;             &quot;code_commune_site&quot;                  </span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co">#&gt; [19] &quot;code_zone_hydro_site&quot;                &quot;libelle_commune&quot;                    </span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">#&gt; [21] &quot;code_departement&quot;                    &quot;code_region&quot;                        </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">#&gt; [23] &quot;libelle_region&quot;                      &quot;code_cours_eau&quot;                     </span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">#&gt; [25] &quot;libelle_cours_eau&quot;                   &quot;uri_cours_eau&quot;                      </span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">#&gt; [27] &quot;grandeur_hydro&quot;                      &quot;date_maj_site&quot;                      </span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">#&gt; [29] &quot;date_premiere_donnee_dispo_site&quot;     &quot;commentaire_influence_generale_site&quot;</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co">#&gt; [31] &quot;commentaire_site&quot;                    &quot;type_contexte_loi_stat_site&quot;        </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co">#&gt; [33] &quot;type_loi_site&quot;                       &quot;libelle_departement&quot;                </span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co">#&gt; [35] &quot;geometry&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">names</span>(donnees_stations)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;code_site&quot;                           &quot;libelle_site&quot;                       </span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">#&gt;  [3] &quot;type_site&quot;                           &quot;coordonnee_x_site&quot;                  </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;coordonnee_y_site&quot;                   &quot;code_projection&quot;                    </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co">#&gt;  [7] &quot;longitude_site&quot;                      &quot;latitude_site&quot;                      </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;altitude_site&quot;                       &quot;code_systeme_alti_site&quot;             </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt; [11] &quot;surface_bv&quot;                          &quot;statut_site&quot;                        </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;premier_mois_etiage_site&quot;            &quot;premier_mois_annee_hydro_site&quot;      </span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">#&gt; [15] &quot;influence_generale_site&quot;             &quot;code_entite_hydro_site&quot;             </span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">#&gt; [17] &quot;code_troncon_hydro_site&quot;             &quot;code_commune_site&quot;                  </span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="co">#&gt; [19] &quot;code_zone_hydro_site&quot;                &quot;libelle_commune&quot;                    </span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="co">#&gt; [21] &quot;code_departement&quot;                    &quot;code_region&quot;                        </span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="co">#&gt; [23] &quot;libelle_region&quot;                      &quot;code_cours_eau&quot;                     </span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co">#&gt; [25] &quot;libelle_cours_eau&quot;                   &quot;uri_cours_eau&quot;                      </span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co">#&gt; [27] &quot;grandeur_hydro&quot;                      &quot;date_maj_site&quot;                      </span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co">#&gt; [29] &quot;date_premiere_donnee_dispo_site&quot;     &quot;commentaire_influence_generale_site&quot;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#&gt; [31] &quot;commentaire_site&quot;                    &quot;type_contexte_loi_stat_site&quot;        </span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">#&gt; [33] &quot;type_loi_site&quot;                       &quot;libelle_departement&quot;                </span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt; [35] &quot;geometry&quot;</span></span></code></pre></div>
 <p>Les premières lignes contiennent par exemple les informations suivantes (sélection de colonnes) :</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>donnees_stations <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(code_site,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>                            libelle_site,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>                            longitude_site,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>                            latitude_site,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>                            altitude_site,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>                            surface_bv,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>                            code_departement) <span class="op">%&gt;%</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># uniquement les premières lignes</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="st">  </span>DT<span class="op">::</span><span class="kw">datatable</span>()</span></code></pre></div>
-<div id="htmlwidget-3c596ac179a8ce737921" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3c596ac179a8ce737921">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["I9122010","J0014010","J0101510","J0121510","J0144010","J0144210"],["L'Airon à Louvigné-du-Désert et à Landivy","Le Nançon à Lécousse","Le Couesnon à Mézières-sur-Couesnon","Le Couesnon à Romazy","La Loisance à Saint-Ouen-la-Rouërie","La Loisance à Saint-Étienne-en-Coglès"],[-1.071908022,-1.196450736,-1.430750755,-1.503785903,-1.435815393,-1.323686429],[48.486959222,48.375583015,48.312096249,48.365470791,48.427932361,48.406523314],[108,105,45,20,50,60],[149.7,64.45,372.1,517.04,82.1,28.23],[["35","53"],["35","35"],"35","35","35","35"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>code_site<\/th>\n      <th>libelle_site<\/th>\n      <th>longitude_site<\/th>\n      <th>latitude_site<\/th>\n      <th>altitude_site<\/th>\n      <th>surface_bv<\/th>\n      <th>code_departement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[3,4,5,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>donnees_stations <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(code_site,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>                            libelle_site,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>                            longitude_site,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>                            latitude_site,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>                            altitude_site,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>                            surface_bv,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>                            code_departement) <span class="op">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># uniquement les premières lignes</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="st">  </span>DT<span class="op">::</span><span class="kw">datatable</span>()</span></code></pre></div>
+<div id="htmlwidget-933040f66893f7f2d703" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-933040f66893f7f2d703">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],["I9122010","J0014010","J0101510","J0121510","J0144010","J0144210"],["L'Airon à Louvigné-du-Désert et à Landivy","Le Nançon à Lécousse","Le Couesnon à Mézières-sur-Couesnon","Le Couesnon à Romazy","La Loisance à Saint-Ouen-la-Rouërie","La Loisance à Saint-Étienne-en-Coglès"],[-1.071908022,-1.196450736,-1.430750755,-1.503785903,-1.435815393,-1.323686429],[48.486959222,48.375583015,48.312096249,48.365470791,48.427932361,48.406523314],[108,105,45,20,50,60],[149.7,64.45,372.1,517.04,82.1,28.23],[["35","53"],["35","35"],"35","35","35","35"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>code_site<\/th>\n      <th>libelle_site<\/th>\n      <th>longitude_site<\/th>\n      <th>latitude_site<\/th>\n      <th>altitude_site<\/th>\n      <th>surface_bv<\/th>\n      <th>code_departement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[3,4,5,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 

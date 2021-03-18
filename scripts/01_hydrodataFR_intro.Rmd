@@ -37,13 +37,17 @@ devtools::install_github("pascalirz/hydrodataFR")
 ## Activation des `packages`.
 
 ```{r, message = FALSE, warning = FALSE}
-library(tod)
 library(tidyverse)
+library(hydrodataFR)
 ```
 
 # Contenu
 
-Ces données sont mises à disposition par l'[API Hub'Eau - Hydrométrie](https://hubeau.eaufrance.fr/page/api-hydrometrie).
+Les données concernées sont :
+
+- Les caractéristiques des stations hydrométriques, via le [portail de la banque HYDRO](http://hydro.eaufrance.fr/).
+- Les synthèses statistiques par station hydrométrique, également via le [portail de la banque HYDRO](http://hydro.eaufrance.fr/).
+- Les cotes et débits en temps réel, via l'[API hydrométrie](https://hubeau.eaufrance.fr/page/api-hydrometrie).
 
 Le référentiel associé est [disponible en ligne](https://www.sandre.eaufrance.fr/notice-doc/r%C3%A9f%C3%A9rentiel-hydrom%C3%A9trique-3).
 
@@ -53,19 +57,7 @@ La plupart des données sont rattachées à un site ou à une station de mesure.
 - Sélection géographique soit rectangulaire (`bbox`) soit circulaire (en indiquant les coordonnées du point central et un rayon)
 - Parfois sur l'appartenance à une entité administrative identifiée par son [Code Officiel Géographique (COG)](https://www.data.gouv.fr/fr/datasets/code-officiel-geographique-cog/).
 
-L'API comprend plusieurs limitations : 
-
-- Elle ne permet pas de remonter au-delà d'un mois.
-- Elle limite le téléchargement à 20 000 données par requête.
-- Quand le téléchargement comporte plusieurs stations, le pas de temps `timestep` n'est plus activé donc on est contraints au pas de 10' par défaut, et par conséquent à des chroniques avec 6 fois moins de longueur que si l'on avait `timestep = 60`.
-
->Il se peut aussi qu'au bout d'un moment un message d'erreur "HTTP error 502" ou "504" vous soit retourné. 
-
-![](../assets/erreur_502.png)
-
-Dans ce cas des codes erreurs dans la gamme des 500, c'est le serveur qui n'a pas réussi à traiter correctement votre requête ou que la connexion est mauvaise. **Normalement en recommençant ça finit par passer**.
-
-Les fonctions du `package` utilisées ici sont toutes préfixées `menv_bh` en référence au founrisseur de la donnée, le Ministère de l'Environnement (`menv`) et à la source, la banque HYDRO (`bh`). 
+Les fonctions du `package` utilisées ici sont préfixées en référence à la source, par exemple `bh_` pour la banque HYDRO. 
 
 # Caractéristiques des stations
 
@@ -76,13 +68,13 @@ L'API donne accès à certaines données basiques sur les stations HYDRO. Il est
 - Séparateur décimal
 
 ```{r, eval = FALSE}
-donnees_stations <- menv_bh_sta_tod(bbox = "-7, 46, -3, 48")
+donnees_stations <- bh_sta_data(bbox = "-7, 46, -3, 48")
 ```
 
 Autre exemple, si l'on s'intéresse aux stations de la région Bretagne (code Insee = 53) :
 
 ```{r, eval = TRUE}
-donnees_stations <- menv_bh_sta_tod(code_region = 53)
+donnees_stations <- bh_sta_data(code_region = 53)
 ```
 
 On obtient un tableau de `r nrow(donnees_stations)` lignes et `r ncol(donnees_stations)` colonnes nommées :

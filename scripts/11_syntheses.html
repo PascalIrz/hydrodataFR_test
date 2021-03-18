@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pascal Irz" />
 
-<meta name="date" content="2021-03-08" />
+<meta name="date" content="2021-03-18" />
 
 <title>Package {hydrodataFR} - Synthèses</title>
 
@@ -325,7 +325,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Package {hydrodataFR} - Synthèses</h1>
 <h4 class="author">Pascal Irz</h4>
-<h4 class="date">2021-03-08</h4>
+<h4 class="date">2021-03-18</h4>
 
 
 
@@ -368,9 +368,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="lecture-des-données" class="section level1">
 <h1>Lecture des données</h1>
 <p>La fonction <code>bh_sy_parser()</code> permet de <em>parser</em>, c’est-à-dire d’interprêter, le contenu du fichier CSV.</p>
-<p>Les préfixes des noms de cette famille de fonctions correspondent à <code>bh</code> pour “Banque HYDRO” et <code>sy</code> pour “Synthèse”.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># Lecture du fichier texte</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>syntheses &lt;-<span class="st"> </span><span class="kw">bh_sy_parser</span>(<span class="st">&quot;../raw_data/5590_4_synthese.csv&quot;</span>)</span></code></pre></div>
+<p>Les préfixes des noms de cette famille de fonctions correspondent à <code>bh</code> pour “Banque HYDRO” et <code>sy_</code> pour “Synthèse”.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>syntheses &lt;-<span class="st"> </span><span class="kw">bh_sy_parser</span>(<span class="st">&quot;../raw_data/5590_4_synthese.csv&quot;</span>)</span></code></pre></div>
 </div>
 <div id="structure-obtenue" class="section level1">
 <h1>Structure obtenue</h1>
@@ -383,39 +382,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Ensuite, on si l’on s’intéresse à une des stations, voici le contenu :</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>syntheses<span class="op">$</span>J0121510</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">#&gt; $em</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">#&gt;                 Janv. Fév.  Mars  Avr.   Mai  Juin Juil. Août Sept.  Oct.  Nov.</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)    9.95 10.3  8.04  5.46  4.45  2.95  1.79 1.13  1.08  2.24  4.21</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">#&gt;                 Janv. Fev.  Mars  Avr.   Mai  Juin Juil. Aout Sept.  Oct.  Nov.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)    9.95 10.3  8.04  5.46  4.45  2.95  1.79 1.13  1.08  2.24  4.21</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co">#&gt; Qsp (l/s/km2)   19.50 20.2 15.80 10.70  8.70  5.80  3.50 2.20  2.10  4.40  8.20</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">#&gt; Lame d&#39;eau (mm) 52.00 50.0 42.00 27.00 23.00 15.00  9.00 5.00  5.00 11.00 21.00</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt;                  Déc.</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)    7.28</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt;                  Dec.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)    7.28</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">#&gt; Qsp (l/s/km2)   14.30</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">#&gt; Lame d&#39;eau (mm) 38.00</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="co">#&gt; $mi</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale sèche est Quinquennale sèche min</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)                    3.2                    2.7</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale sèche max Médiane est Médiane min Médiane max</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)                    3.7         4.9         4.2         5.8</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale seche est Quinquennale seche min</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)                    3.2                    2.7</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale seche max Mediane est Mediane min Mediane max</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)                    3.7         4.9         4.2         5.8</span></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale humide est Quinquennale humide min</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)                     6.5                       6</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)                     6.5                       6</span></span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt;               Quinquennale humide max</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)                     7.1</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)                     7.1</span></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; $mm</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="co">#&gt;               Module (moyenne) est Module (moyenne) min Module (moyenne) max</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)                 4.88                 4.43                 5.33</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Debits (m3/s)                 4.88                 4.43                 5.33</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a><span class="co">#&gt; $be</span></span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a><span class="co">#&gt;                    VCN3 (m3/s) est VCN3 (m3/s) min VCN3 (m3/s) max</span></span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a><span class="co">#&gt; Biennale                      0.45            0.39            0.53</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a><span class="co">#&gt; Quinquennale sèche            0.26            0.21            0.31</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a><span class="co">#&gt; Quinquennale seche            0.26            0.21            0.31</span></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a><span class="co">#&gt;                    VCN10 (m3/s) est VCN10 (m3/s) min VCN10 (m3/s) max</span></span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a><span class="co">#&gt; Biennale                       0.51             0.44             0.59</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a><span class="co">#&gt; Quinquennale sèche             0.30             0.25             0.35</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a><span class="co">#&gt; Quinquennale seche             0.30             0.25             0.35</span></span>
 <span id="cb5-33"><a href="#cb5-33" aria-hidden="true"></a><span class="co">#&gt;                    QMNA (m3/s) est QMNA (m3/s) min QMNA (m3/s) max</span></span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true"></a><span class="co">#&gt; Biennale                      0.68            0.59            0.78</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a><span class="co">#&gt; Quinquennale sèche            0.41            0.34            0.47</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a><span class="co">#&gt; Quinquennale seche            0.41            0.34            0.47</span></span>
 <span id="cb5-36"><a href="#cb5-36" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb5-37"><a href="#cb5-37" aria-hidden="true"></a><span class="co">#&gt; $be2</span></span>
 <span id="cb5-38"><a href="#cb5-38" aria-hidden="true"></a><span class="co">#&gt;            VCN3 (m3/s) VCN10 (m3/s) QMNA (m3/s)</span></span>
@@ -431,31 +430,90 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-48"><a href="#cb5-48" aria-hidden="true"></a><span class="co">#&gt;                QJ (m3/s) est QJ (m3/s) min QJ (m3/s) max QIX (m3/s) est</span></span>
 <span id="cb5-49"><a href="#cb5-49" aria-hidden="true"></a><span class="co">#&gt; Biennale                  30            28            32             33</span></span>
 <span id="cb5-50"><a href="#cb5-50" aria-hidden="true"></a><span class="co">#&gt; Quinquennale              41            38            45             44</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true"></a><span class="co">#&gt; Décennale                 48            44            53             52</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true"></a><span class="co">#&gt; Decennale                 48            44            53             52</span></span>
 <span id="cb5-52"><a href="#cb5-52" aria-hidden="true"></a><span class="co">#&gt; Vicennale                 54            50            62             59</span></span>
 <span id="cb5-53"><a href="#cb5-53" aria-hidden="true"></a><span class="co">#&gt; Cinquantennale            63            57            73             69</span></span>
 <span id="cb5-54"><a href="#cb5-54" aria-hidden="true"></a><span class="co">#&gt;                QIX (m3/s) min QIX (m3/s) max</span></span>
 <span id="cb5-55"><a href="#cb5-55" aria-hidden="true"></a><span class="co">#&gt; Biennale                   31             35</span></span>
 <span id="cb5-56"><a href="#cb5-56" aria-hidden="true"></a><span class="co">#&gt; Quinquennale               41             49</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true"></a><span class="co">#&gt; Décennale                  48             58</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true"></a><span class="co">#&gt; Decennale                  48             58</span></span>
 <span id="cb5-58"><a href="#cb5-58" aria-hidden="true"></a><span class="co">#&gt; Vicennale                  54             68</span></span>
 <span id="cb5-59"><a href="#cb5-59" aria-hidden="true"></a><span class="co">#&gt; Cinquantennale             63             79</span></span>
 <span id="cb5-60"><a href="#cb5-60" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb5-61"><a href="#cb5-61" aria-hidden="true"></a><span class="co">#&gt; $dc</span></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true"></a><span class="co">#&gt;              f_ 0.99 f_ 0.98 f_ 0.95 f_ 0.90 f_ 0.80 f_ 0.70 f_ 0.60 f_ 0.50</span></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true"></a><span class="co">#&gt; Débit (m3/s)    28.5    23.5    17.2    12.4     7.6    5.25     3.6    2.61</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true"></a><span class="co">#&gt;              f_ 0.40 f_ 0.30 f_ 0.20 f_ 0.10 f_ 0.05 f_ 0.02 f_ 0.01</span></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true"></a><span class="co">#&gt; Débit (m3/s)    1.88    1.32    0.92     0.6    0.46    0.32    0.24</span></span></code></pre></div>
-<p>C’est un peu fouillis, en apparence du moins. En effet, on peut accéder par exemple aux écoulements mensuels de cette station :</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>syntheses<span class="op">$</span>J0121510<span class="op">$</span>em</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt;                 Janv. Fév.  Mars  Avr.   Mai  Juin Juil. Août Sept.  Oct.  Nov.</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)    9.95 10.3  8.04  5.46  4.45  2.95  1.79 1.13  1.08  2.24  4.21</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">#&gt; Qsp (l/s/km2)   19.50 20.2 15.80 10.70  8.70  5.80  3.50 2.20  2.10  4.40  8.20</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; Lame d&#39;eau (mm) 52.00 50.0 42.00 27.00 23.00 15.00  9.00 5.00  5.00 11.00 21.00</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">#&gt;                  Déc.</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co">#&gt; Débits (m3/s)    7.28</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">#&gt; Qsp (l/s/km2)   14.30</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; Lame d&#39;eau (mm) 38.00</span></span></code></pre></div>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true"></a><span class="co">#&gt;              f_0.99 f_0.98 f_0.95 f_0.90 f_0.80 f_0.70 f_0.60 f_0.50 f_0.40</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true"></a><span class="co">#&gt; Debit (m3/s)   28.5   23.5   17.2   12.4    7.6   5.25    3.6   2.61   1.88</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true"></a><span class="co">#&gt;              f_0.30 f_0.20 f_0.10 f_0.05 f_0.02 f_0.01</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true"></a><span class="co">#&gt; Debit (m3/s)   1.32   0.92    0.6   0.46   0.32   0.24</span></span></code></pre></div>
+<p>C’est un peu fouillis, en apparence du moins. En effet, on peut accéder par exemple aux écoulements mensuels de cette station. La fonction <code>kable()</code> du package <code>knitr</code> sert juste à la mise en forme.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>syntheses<span class="op">$</span>J0121510<span class="op">$</span>em <span class="op">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Janv.</th>
+<th align="right">Fev.</th>
+<th align="right">Mars</th>
+<th align="right">Avr.</th>
+<th align="right">Mai</th>
+<th align="right">Juin</th>
+<th align="right">Juil.</th>
+<th align="right">Aout</th>
+<th align="right">Sept.</th>
+<th align="right">Oct.</th>
+<th align="right">Nov.</th>
+<th align="right">Dec.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Debits (m3/s)</td>
+<td align="right">9.95</td>
+<td align="right">10.3</td>
+<td align="right">8.04</td>
+<td align="right">5.46</td>
+<td align="right">4.45</td>
+<td align="right">2.95</td>
+<td align="right">1.79</td>
+<td align="right">1.13</td>
+<td align="right">1.08</td>
+<td align="right">2.24</td>
+<td align="right">4.21</td>
+<td align="right">7.28</td>
+</tr>
+<tr class="even">
+<td align="left">Qsp (l/s/km2)</td>
+<td align="right">19.50</td>
+<td align="right">20.2</td>
+<td align="right">15.80</td>
+<td align="right">10.70</td>
+<td align="right">8.70</td>
+<td align="right">5.80</td>
+<td align="right">3.50</td>
+<td align="right">2.20</td>
+<td align="right">2.10</td>
+<td align="right">4.40</td>
+<td align="right">8.20</td>
+<td align="right">14.30</td>
+</tr>
+<tr class="odd">
+<td align="left">Lame d’eau (mm)</td>
+<td align="right">52.00</td>
+<td align="right">50.0</td>
+<td align="right">42.00</td>
+<td align="right">27.00</td>
+<td align="right">23.00</td>
+<td align="right">15.00</td>
+<td align="right">9.00</td>
+<td align="right">5.00</td>
+<td align="right">5.00</td>
+<td align="right">11.00</td>
+<td align="right">21.00</td>
+<td align="right">38.00</td>
+</tr>
+</tbody>
+</table>
 <p>Pour rendre l’accès plus simple, la fonction <code>bh_sy_ind_sta()</code> prend des paramètres plus explicites :</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">bh_sy_ind_sta</span>(<span class="dt">syntheses =</span> syntheses,</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>              <span class="dt">sta_id =</span> <span class="st">&quot;J0121510&quot;</span>,</span>
@@ -477,12 +535,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <thead>
 <tr class="header">
 <th align="left"></th>
-<th align="right">Quinquennale sèche est</th>
-<th align="right">Quinquennale sèche min</th>
-<th align="right">Quinquennale sèche max</th>
-<th align="right">Médiane est</th>
-<th align="right">Médiane min</th>
-<th align="right">Médiane max</th>
+<th align="right">Quinquennale seche est</th>
+<th align="right">Quinquennale seche min</th>
+<th align="right">Quinquennale seche max</th>
+<th align="right">Mediane est</th>
+<th align="right">Mediane min</th>
+<th align="right">Mediane max</th>
 <th align="right">Quinquennale humide est</th>
 <th align="right">Quinquennale humide min</th>
 <th align="right">Quinquennale humide max</th>
@@ -490,7 +548,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Débits (m3/s)</td>
+<td align="left">Debits (m3/s)</td>
 <td align="right">3.2</td>
 <td align="right">2.7</td>
 <td align="right">3.7</td>
@@ -507,7 +565,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>syntheses<span class="op">$</span>J0121510 <span class="op">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="st">  </span><span class="kw">names</span>()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;em&quot;  &quot;mi&quot;  &quot;mm&quot;  &quot;be&quot;  &quot;be2&quot; &quot;cr&quot;  &quot;cr2&quot; &quot;dc&quot;</span></span></code></pre></div>
-<p>Ce qui s’interprête ainsi :</p>
+<p>Ce qui s’interprète ainsi :</p>
 <table>
 <thead>
 <tr class="header">
@@ -565,11 +623,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;Mois&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># les mois sont mis dans une colonne, puis</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Mois =</span> <span class="kw">fct_inorder</span>(Mois)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># on les fige dans l&#39;ordre chronologique</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Mois,</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>             <span class="dt">y =</span> <span class="st">`</span><span class="dt">Débits (m3/s)</span><span class="st">`</span>)) <span class="op">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>             <span class="dt">y =</span> <span class="st">`</span><span class="dt">Debits (m3/s)</span><span class="st">`</span>)) <span class="op">+</span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a><span class="st">      </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>,</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>               <span class="dt">fill =</span> <span class="st">&quot;#54b5c5&quot;</span>) <span class="op">+</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a><span class="st">      </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;&quot;</span>, <span class="dt">title =</span> ma_station)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a><span class="st">      </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Débit (m3/s)&quot;</span>, <span class="dt">title =</span> ma_station)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <p>Ou bien pour les fréquences cumulées des débits :</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>donnees &lt;-<span class="st"> </span><span class="kw">bh_sy_ind_sta</span>(<span class="dt">syntheses =</span> syntheses,</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>              <span class="dt">sta_id =</span> ma_station,</span>
@@ -583,11 +641,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>debit_median &lt;-<span class="st"> </span>donnees <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(frequence <span class="op">==</span><span class="st"> </span><span class="fl">0.5</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">pull</span>(<span class="st">`</span><span class="dt">Débit (m3/s)</span><span class="st">`</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">pull</span>(<span class="st">`</span><span class="dt">Debit (m3/s)</span><span class="st">`</span>)</span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>etiquette &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Débit médian : &quot;</span>, debit_median, <span class="st">&quot; m3/s&quot;</span>)</span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> donnees, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="st">`</span><span class="dt">Débit (m3/s)</span><span class="st">`</span>, <span class="dt">y =</span> frequence)) <span class="op">+</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a><span class="kw">ggplot</span>(<span class="dt">data =</span> donnees, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="st">`</span><span class="dt">Debit (m3/s)</span><span class="st">`</span>, <span class="dt">y =</span> frequence)) <span class="op">+</span></span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a><span class="st">      </span><span class="kw">geom_line</span>(<span class="dt">color =</span> <span class="st">&quot;#54b5c5&quot;</span>, <span class="dt">size =</span> <span class="dv">1</span>) <span class="op">+</span></span>
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a><span class="st">      </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> debit_median, <span class="dt">color =</span> <span class="st">&quot;red&quot;</span>) <span class="op">+</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="st">      </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="kw">bquote</span>(<span class="st">&#39;Débit (&#39;</span><span class="op">*</span>m<span class="op">^</span><span class="dv">3</span><span class="op">/</span>h<span class="op">*</span><span class="st">&#39;)&#39;</span>),</span>
@@ -599,7 +657,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb10-26"><a href="#cb10-26" aria-hidden="true"></a><span class="st">      </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">percent_format</span>())</span></code></pre></div>
 <p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <blockquote>
-<p>Une fois les données chargées est structurées, l’utilisateur peut en faire ce qu’il veut.</p>
+<p>Une fois les données chargées est structurées, l’utilisateur peut en faire ce qu’il veut. L’imagination au pouvoir, en quelque sorte !</p>
 </blockquote>
 </div>
 

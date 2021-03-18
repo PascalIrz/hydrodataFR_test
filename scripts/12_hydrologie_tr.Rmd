@@ -26,6 +26,17 @@ library(tidyverse)
 
 Ces données de hauteur d'eau et de débit sont mises à disposition par le module [Opérations sur les niveaux et les débits des cours d'eau en temps réel](https://hubeau.eaufrance.fr/page/api-hydrometrie#/hydrometrie/observations) de l'API Hub'Eau - Hydrométrie. Elles se rapportent à la station de mesure.
 
+L'API, pour les données en temps réel, comprend plusieurs limitations : 
+
+- Elle ne permet pas de remonter au-delà d'un mois.
+- Elle limite le téléchargement à 20 000 données par requête.
+- Quand le téléchargement comporte plusieurs stations, le pas de temps `timestep` n'est plus activé donc on est contraints au pas de 10' par défaut, et par conséquent à des chroniques avec 6 fois moins de longueur que si l'on avait `timestep = 60`.
+
+>Il se peut aussi qu'au bout d'un moment un message d'erreur "HTTP error 502" ou "504" vous soit retourné. 
+
+![](../assets/erreur_502.png)
+
+Dans ce cas des codes erreurs dans la gamme des 500, c'est le serveur qui n'a pas réussi à traiter correctement votre requête ou que la connexion est mauvaise. **Normalement en recommençant ça finit par passer**.
 ## Pour une station
 
 ### Téléchargement

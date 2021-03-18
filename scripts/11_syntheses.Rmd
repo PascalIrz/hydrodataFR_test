@@ -68,14 +68,9 @@ Les étapes sont les suivantes :
 
 La fonction `bh_sy_parser()` permet de *parser*, c'est-à-dire d'interprêter, le contenu du fichier CSV.
 
-Les préfixes des noms de cette famille de fonctions correspondent à `bh` pour "Banque HYDRO" et `sy` pour "Synthèse".
+Les préfixes des noms de cette famille de fonctions correspondent à `bh` pour "Banque HYDRO" et `sy_` pour "Synthèse".
 
-```{r, echo = FALSE}
-load(file = "../processed_data/syntheses.RData")
-```
-
-```{r, eval = FALSE}
-# Lecture du fichier texte
+```{r, eval = TRUE, warning = FALSE}
 syntheses <- bh_sy_parser("../raw_data/5590_4_synthese.csv")
 ```
 
@@ -97,10 +92,11 @@ Ensuite, on si l'on s'intéresse à une des stations, voici le contenu :
 syntheses$J0121510
 ```
 
-C'est un peu fouillis, en apparence du moins. En effet, on peut accéder par exemple aux écoulements mensuels de cette station :
+C'est un peu fouillis, en apparence du moins. En effet, on peut accéder par exemple aux écoulements mensuels de cette station. La fonction `kable()` du package `knitr` sert juste à la mise en forme.
 
 ```{r}
-syntheses$J0121510$em
+syntheses$J0121510$em %>%
+  knitr::kable()
 ```
 
 Pour rendre l'accès plus simple, la fonction `bh_sy_ind_sta()` prend des paramètres plus explicites :
@@ -118,7 +114,7 @@ En fait, pour cette station, on dispose des éléments suivants :
 syntheses$J0121510 %>%
   names()
 ```
-Ce qui s'interprête ainsi :
+Ce qui s'interprète ainsi :
 
 ```{r, echo = FALSE}
 data.table::fread("../raw_data/corresp_codes_indicateurs_sy.csv") %>% 
@@ -142,10 +138,10 @@ bh_sy_ind_sta(syntheses = syntheses,
   rownames_to_column("Mois") %>% # les mois sont mis dans une colonne, puis
   mutate(Mois = fct_inorder(Mois)) %>% # on les fige dans l'ordre chronologique
   ggplot(aes(x = Mois,
-             y = `Débits (m3/s)`)) +
+             y = `Debits (m3/s)`)) +
       geom_bar(stat = "identity",
                fill = "#54b5c5") +
-      labs(x = "", title = ma_station)
+      labs(x = "", y = "Débit (m3/s)", title = ma_station)
 ```
 
 Ou bien pour les fréquences cumulées des débits :
@@ -163,11 +159,11 @@ donnees <- bh_sy_ind_sta(syntheses = syntheses,
 
 debit_median <- donnees %>% 
   filter(frequence == 0.5) %>% 
-  pull(`Débit (m3/s)`)
+  pull(`Debit (m3/s)`)
 
 etiquette <- paste("Débit médian : ", debit_median, " m3/s")
 
-ggplot(data = donnees, aes(x = `Débit (m3/s)`, y = frequence)) +
+ggplot(data = donnees, aes(x = `Debit (m3/s)`, y = frequence)) +
       geom_line(color = "#54b5c5", size = 1) +
       geom_vline(xintercept = debit_median, color = "red") +
       labs(x = bquote('Débit ('*m^3/h*')'),
@@ -180,7 +176,7 @@ ggplot(data = donnees, aes(x = `Débit (m3/s)`, y = frequence)) +
   
 ```
 
->Une fois les données chargées est structurées, l'utilisateur peut en faire ce qu'il veut.
+>Une fois les données chargées est structurées, l'utilisateur peut en faire ce qu'il veut. L'imagination au pouvoir, en quelque sorte !
 
 
 
