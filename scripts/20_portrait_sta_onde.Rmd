@@ -23,7 +23,10 @@ library(ondetools)
 library(hydrodataFR)
 source(file = "fonctions_mise_en_forme_flextable.R")
 library(flextable)
+library(mapview)
 ```
+
+
 
 ## Téléchargement des débits en temps réel
 
@@ -229,10 +232,46 @@ syn_data$dc %>%
 geo_sta <- sta_data %>% 
   sf::st_as_sf(coords = c("coordonnee_x_site", "coordonnee_y_site"), crs = 2154)
 
-m <- mapview::mapview(geo_sta)
-
-m@map %>% leaflet::setView(lng = sta_data[1, "longitude_site"],
-                           lat = sta_data[1, "latitude_site"],
-                           zoom = 8)
+# m <- mapview(geo_sta)
+# 
+# m@map %>% leaflet::setView(lng = sta_data[1, "longitude_site"],
+#                            lat = sta_data[1, "latitude_site"],
+#                            zoom = 8)
 ```
+
+## Station(s) hydro en aval ?
+
+```{r}
+bv_shydro <- sf::read_sf("../raw_data/bv_stations_hydro_bretagnoide.gpkg")
+
+codes_sta_hydr <- sf::st_join(geo_sta, bv_shydro) %>% 
+  pull(codehydro)
+
+bv_shydro <- bv_shydro %>% 
+  filter(codehydro %in% codes_sta_hydr)
+
+if (nrow(bv_shydro) > 1)
+  
+{
+  
+  bv_shydro <- bv_shydro %>% 
+    filter(sbvcartesi == min(sbvcartesi))
+}
+
+shydro_geo <- bv_shydro %>% 
+  sf::st_drop_geometry() %>% 
+  sf::st_as_sf(coords = c("xl93", "yl93"), crs = 2154)
+
+mapviewOptions(basemaps = c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap"))
+
+mapview(bv_shydro) +
+  mapview(shydro_geo, col.regions = "red") +
+  mapview(geo_sta)
+  
+
+
+
+
+```
+
 
