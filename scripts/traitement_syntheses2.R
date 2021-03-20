@@ -21,14 +21,14 @@ bh_sy_ind_sta(syntheses = syntheses,
   as.data.frame() %>%
   rownames_to_column("Mois") %>%
   mutate(Mois = fct_inorder(Mois)) %>%
-  ggplot(aes(x = Mois, y = `Débits (m3/s)`)) +
+  ggplot(aes(x = Mois, y = `Debits (m3/s)`)) +
       geom_bar(stat = "identity", fill = "#54b5c5") +
       labs(x = "", title = ma_station)
 
 prov <- donnees %>%
   arrange(frequence) %>%
          frequence_non_cumulee = frequence - lag(frequence, 1),
-         debit_diff = (`Débit (m3/s)` - lag(`Débit (m3/s)`, 1)),
+         debit_diff = (`Debit (m3/s)` - lag(`Debit (m3/s)`, 1)),
          hauteur_barre = frequence_non_cumulee / debit_diff) %>%
   group_by()
 

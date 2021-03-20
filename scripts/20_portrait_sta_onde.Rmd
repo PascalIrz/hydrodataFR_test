@@ -1,0 +1,238 @@
+---
+title: "Portrait de station ONDE"
+author: "OFB Bretagne"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+# Préparation des données
+
+## Activation des packages
+
+```{r, class.source = 'fold-show'}
+library(tidyverse)
+library(ondetools)
+library(hydrodataFR)
+source(file = "fonctions_mise_en_forme_flextable.R")
+library(flextable)
+```
+
+## Téléchargement des débits en temps réel
+
+```{r, class.source = 'fold-show'}
+ma_station <- "J0121510"
+
+htr_data <- bh_htr(stations_id = ma_station,
+                   grandeur_hydro = "Q") %>% 
+  mutate(date_obs = lubridate::ymd_hms(date_obs)) # format de la date
+```
+
+Visualisation des premières lignes sur quelques colonnes.
+
+```{r}
+htr_data %>% 
+  head() %>%
+  select(code_site:resultat_obs) %>% 
+  flextable() %>% 
+  mef()
+```
+
+## Téléchargement caractéristiques station
+
+```{r, class.source = 'fold-show'}
+sta_data <- bh_sta_data(code_site = ma_station) 
+```
+
+## Chargement données de synthèse
+
+Ces données ont été téléchargées et mises en forme auparavant (cf ....).
+
+```{r, class.source = 'fold-show'}
+load(file = "../processed_data/syntheses.RData")
+
+syn_data <- syntheses %>% 
+  .[[ma_station]]
+```
+
+# Constitution des éléments du portrait
+
+## Graphique débit temps réel
+
+```{r, class.source = 'fold-show'}
+g_htr <- ggplot(data = htr_data, aes(x = date_obs, y = resultat_obs)) +
+  geom_line() +
+  scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(x = "", y = bquote('Débit')) # légendes des axes
+
+g_htr
+```
+
+## Caractéristiques de la station
+
+```{r}
+prov <- sta_data %>% 
+  select(-(type_site:code_projection),
+         -code_systeme_alti_site,
+         -(statut_site:influence_generale_site),
+         -(grandeur_hydro:date_maj_site),
+         -(type_contexte_loi_stat_site:geometry))
+
+noms_lignes <- colnames(prov)
+
+valeurs <- prov %>% 
+  as.character() %>% 
+  str_remove_all('list\\("') %>% 
+  str_remove_all('\\)') %>% 
+  str_remove_all('\\"')
+
+t_sta_data <- cbind(noms_lignes, valeurs) %>% 
+  as.data.frame()
+
+t_sta_data  %>% 
+  flextable() %>% 
+  mef() %>% 
+  align(align = "left", part = "all")
+```
+
+## Synthèses statistiques
+
+```{r}
+couleur_estimations <- "red"
+```
+
+
+### Ecoulements mensuels
+
+```{r}
+syn_data$em %>% 
+  rownames_to_column("Variable") %>% 
+  flextable() %>% 
+  mef() %>% 
+  align(j = 1, align = "left")
+```
+### Modules interannuels (naturels) - Débits
+
+```{r}
+syn_data$mi %>% 
+  rownames_to_column("Variable") %>% 
+  flextable() %>% 
+  set_header_labels(
+    `Variable` = "Variable",
+    `Quinquennale seche est` = "est.", `Quinquennale seche min` = "min.", `Quinquennale seche max` = "max.",
+    `Mediane est` = "est.", `Mediane min` = "min.", `Mediane max` = "max.",
+    `Quinquennale humide est` = "est.", `Quinquennale humide min` = "min.", `Quinquennale humide max` = "max.") %>% 
+  color_est(couleur = couleur_estimations) %>% 
+  add_header_row(colwidths = c(1, 3, 3, 3), values = c("", "Quinquennale sèche", "Médiane", "Quinquennale humide")) %>% 
+  mef() %>% 
+  vline(j = c('Quinquennale seche max', 'Mediane max'), part = "all") %>% 
+  align(j = 1, align = "left", part = "all")
+```
+
+
+### Modules interannuels (naturels) - Moyenne
+
+```{r}
+syn_data$mm %>% 
+  rownames_to_column("Variable") %>% 
+  flextable() %>% 
+  set_header_labels(
+    `Variable` = "Variable",
+    `Module (moyenne) est` = "est.", `Module (moyenne) min` = "min.", `Module (moyenne) max` = "max.") %>% 
+  color_est(couleur = couleur_estimations) %>% 
+  add_header_row(colwidths = c(1, 3), values = c("", "Module (moyenne)")) %>% 
+  mef() %>% 
+  align(j = 1, align = "left", part = "all")
+```
+
+### Basses eaux - Biennale et quinquennale
+
+```{r}
+syn_data$be %>% 
+  rownames_to_column("Période de retour") %>% 
+  flextable() %>% 
+  set_header_labels(
+    `Période de retour` = "Période de retour",
+    `VCN3 (m3/s) est` = "est.", `VCN3 (m3/s) min` = "min.", `VCN3 (m3/s) max` = "max.",
+    `VCN10 (m3/s) est` = "est.", `VCN10 (m3/s) min` = "min.", `VCN10 (m3/s) max` = "max.",
+    `QMNA (m3/s) est` = "est.", `QMNA (m3/s) min` = "min.", `QMNA (m3/s) max` = "max.") %>% 
+  color_est(couleur = couleur_estimations) %>% 
+  add_header_row(colwidths = c(1, 3, 3, 3), values = c("", "VCN3", "VCN10", "QMNA")) %>% 
+  mef() %>% 
+  vline(j = c('VCN3 (m3/s) max', 'VCN10 (m3/s) max'), part = "all") %>% 
+  align(j = 1, align = "left", part = "all")
+```
+
+### Basses eaux - Moyenne et écart-type
+
+```{r}
+syn_data$be2 %>% 
+  rownames_to_column("Statistique") %>% 
+  flextable() %>% 
+  mef()
+```
+
+### Crues - Xo, Gradex
+
+```{r}
+syn_data$cr %>% 
+  rownames_to_column("Méthode") %>% 
+  flextable() %>% 
+  mef()
+```
+
+### Crues - Périodes de retour
+
+```{r}
+syn_data$cr2 %>% 
+  rownames_to_column("Période de retour") %>% 
+  flextable() %>% 
+  set_header_labels(
+    `Période de retour` = "Période de retour",
+    `QJ (m3/s) est` = "est.", `QJ (m3/s) min` = "min.", `QJ (m3/s) max` = "max.",
+    `QIX (m3/s) est` = "est.", `QIX (m3/s) min` = "min.", `QIX (m3/s) max` = "max.") %>% 
+  color_est(couleur = couleur_estimations) %>% 
+  add_header_row(colwidths = c(1, 3, 3), values = c("", "Qj", "QIX")) %>% 
+  mef() %>% 
+  vline(j = c('QJ (m3/s) max'), part = "all") %>% 
+  align(j = 1, align = "left", part = "all")
+
+```
+
+### Débits classés
+
+```{r}
+noms_colonnes <- syn_data$dc %>% 
+  colnames() %>% 
+  str_sub(start = 3)
+
+noms_colonnes <- c("Fréquence", noms_colonnes)
+
+syn_data$dc %>% 
+  rownames_to_column("Variable") %>% 
+  purrr::set_names(noms_colonnes) %>% 
+  flextable() %>% 
+  mef()
+```
+
+## Localisation
+
+```{r}
+geo_sta <- sta_data %>% 
+  sf::st_as_sf(coords = c("coordonnee_x_site", "coordonnee_y_site"), crs = 2154)
+
+m <- mapview::mapview(geo_sta)
+
+m@map %>% leaflet::setView(lng = sta_data[1, "longitude_site"],
+                           lat = sta_data[1, "latitude_site"],
+                           zoom = 8)
+```
+

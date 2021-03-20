@@ -178,5 +178,8 @@ ggplot(data = donnees, aes(x = `Debit (m3/s)`, y = frequence)) +
 
 >Une fois les données chargées est structurées, l'utilisateur peut en faire ce qu'il veut. L'imagination au pouvoir, en quelque sorte !
 
+```{r}
+save(syntheses, file = "../processed_data/syntheses.RData")
+```
 
 
