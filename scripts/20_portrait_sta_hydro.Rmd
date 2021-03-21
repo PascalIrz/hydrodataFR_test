@@ -1,6 +1,6 @@
 ---
-title: "Portrait de station ONDE"
-author: "OFB Bretagne"
+title: "Portrait de station hydro"
+author: "Pascal Irz"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -35,18 +35,12 @@ ma_station <- "J0121510"
 
 htr_data <- bh_htr(stations_id = ma_station,
                    grandeur_hydro = "Q") %>% 
-  mutate(date_obs = lubridate::ymd_hms(date_obs)) # format de la date
+  mutate(date_obs = lubridate::ymd_hms(date_obs), # format de la date
+         debit = resultat_obs / 1000) %>%  # débits en m3/s
+  select(-resultat_obs)
 ```
 
-Visualisation des premières lignes sur quelques colonnes.
 
-```{r}
-htr_data %>% 
-  head() %>%
-  select(code_site:resultat_obs) %>% 
-  flextable() %>% 
-  mef()
-```
 
 ## Téléchargement caractéristiques station
 
@@ -67,7 +61,36 @@ syn_data <- syntheses %>%
 
 # Constitution des éléments du portrait
 
-## Graphique débit temps réel
+## Débit temps réel
+
+Visualisation des premières lignes sur quelques colonnes.
+
+```{r}
+htr_data %>% 
+  head() %>%
+  select(code_site, code_station, grandeur_hydro, date_obs, debit) %>% 
+  flextable() %>% 
+  mef()
+```
+
+
+Dernière observation.
+
+```{r}
+dern_obs <- htr_data %>% 
+  filter(date_obs == max(date_obs, na.rm = TRUE))
+
+# flexdashboard::valueBox(value = dern_obs$debit,
+#                         caption = "m3/s",
+#                         icon = "fa-pencil")
+  
+```
+
+Débit observé le `r dern_obs$date_obs %>% format('%d/%m/%Y')` à `r dern_obs$date_obs %>% lubridate::hour()`h`r dern_obs$date_obs %>% lubridate::minute()` : `r dern_obs$debit` $m^3/s$.
+
+La courbe indique les valeurs récentes de débit, les barres bleu ciel les débits mensuels moyens issus des synthèses de la station.
+
+En marron pointillé le module interannuel et en rouge continu le $QMNA_5$.
 
 ```{r, class.source = 'fold-show'}
 em_long <- syn_data %>% 
@@ -83,13 +106,19 @@ data <- htr_data %>%
   left_join(y = em_long)
 
 g_htr <- ggplot(data = data,
-                aes(x = date_obs, y = resultat_obs / 1000)) +
-  geom_line() +
-  geom_bar(aes(y = em), stat = "identity") +
+                aes(x = date_obs, y = debit)) +
+  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.15, fill = "lightblue") +
+    geom_line() +
   scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
   scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "", y = bquote('Débit')) # légendes des axes
-
+  labs(x = "", y = bquote('Débit ('*m^3/s*')')) + # légendes des axes
+  geom_hline(yintercept = syn_data$mm$`Module (moyenne) est`,
+             col = "firebrick4", linetype = "dashed") +
+  geom_hline(yintercept = syn_data$be %>% 
+                          .["Quinquennale seche",] %>%
+                          pull(`QMNA (m3/s) est`),
+             col = "red")
+  
 g_htr
 ```
 
@@ -281,11 +310,6 @@ mapviewOptions(basemaps = c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
 mapview(bv_shydro) +
   mapview(shydro_geo, col.regions = "red") +
   mapview(geo_sta)
-  
-
-
-
-
 ```
 
 
