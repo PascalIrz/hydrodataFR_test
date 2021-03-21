@@ -45,7 +45,11 @@ htr_data <- bh_htr(stations_id = ma_station,
 ## Téléchargement caractéristiques station
 
 ```{r, class.source = 'fold-show'}
-sta_data <- bh_sta_data(code_site = ma_station) 
+sta_data <- bh_sta_data(code_site = ma_station)
+
+libelle_ma_station <- sta_data %>% 
+  filter(code_site == ma_station) %>% 
+  pull(libelle_site)
 ```
 
 ## Chargement données de synthèse
@@ -57,13 +61,15 @@ load(file = "../processed_data/syntheses.RData")
 
 syn_data <- syntheses %>% 
   .[[ma_station]]
+
+libelle_station <- sta_data$libelle_site
 ```
 
 # Constitution des éléments du portrait
 
 ## Débit temps réel
 
-Visualisation des premières lignes sur quelques colonnes.
+`r libelle_station` : visualisation des premières lignes sur quelques colonnes.
 
 ```{r}
 htr_data %>% 
@@ -72,9 +78,6 @@ htr_data %>%
   flextable() %>% 
   mef()
 ```
-
-
-Dernière observation.
 
 ```{r}
 dern_obs <- htr_data %>% 
@@ -86,13 +89,13 @@ dern_obs <- htr_data %>%
   
 ```
 
-Débit observé le `r dern_obs$date_obs %>% format('%d/%m/%Y')` à `r dern_obs$date_obs %>% lubridate::hour()`h`r dern_obs$date_obs %>% lubridate::minute()` : `r dern_obs$debit` $m^3/s$.
+Dernière observation de débit le `r dern_obs$date_obs %>% format('%d/%m/%Y')` à `r dern_obs$date_obs %>% lubridate::hour()`h`r dern_obs$date_obs %>% lubridate::minute()` : `r dern_obs$debit` $m^3/s$.
 
 La courbe indique les valeurs récentes de débit, les barres bleu ciel les débits mensuels moyens issus des synthèses de la station.
 
 En marron pointillé le module interannuel et en rouge continu le $QMNA_5$.
 
-```{r, class.source = 'fold-show'}
+```{r}
 em_long <- syn_data %>% 
   .[["em"]] %>%
   purrr::set_names(1:12) %>% 
@@ -105,19 +108,27 @@ data <- htr_data %>%
   mutate(mois = lubridate::month(date_obs) %>% as.character) %>%
   left_join(y = em_long)
 
+hline_data <- data.frame(
+  y = c(syn_data$mm$`Module (moyenne) est`,
+        syn_data$be %>% .["Quinquennale seche",] %>% pull(`QMNA (m3/s) est`)),
+  type = c("dashed", "solid"),
+  couleur = c("brown", "red")
+)
+
 g_htr <- ggplot(data = data,
                 aes(x = date_obs, y = debit)) +
-  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.15, fill = "lightblue") +
+  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.15, fill = "#54b5c5") +
     geom_line() +
   scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
   scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "", y = bquote('Débit ('*m^3/s*')')) + # légendes des axes
-  geom_hline(yintercept = syn_data$mm$`Module (moyenne) est`,
-             col = "firebrick4", linetype = "dashed") +
-  geom_hline(yintercept = syn_data$be %>% 
-                          .["Quinquennale seche",] %>%
-                          pull(`QMNA (m3/s) est`),
-             col = "red")
+  labs(x = "", y = bquote('Débit ('*m^3/s*')'), title = libelle_station) + # légendes
+  geom_hline(data = hline_data, aes(yintercept = y, col = couleur, linetype = type)) +
+  scale_colour_manual(values = c("brown", "red"), 
+                      labels = c("Module", "QMNA5"),
+                      name = "Statistique") +
+  scale_linetype_manual(values = c("solid", "dashed"), 
+                        labels = c("Module", "QMNA5"),
+                        name = "Statistique")
   
 g_htr
 ```
@@ -166,6 +177,27 @@ syn_data$em %>%
   vline(j = c('Variable'), part = "all") %>% 
   align(j = 1, align = "left")
 ```
+```{r}
+bh_sy_ind_sta(syntheses = syntheses,
+              sta_id = ma_station,
+              indicateur = "em") %>% 
+  t() %>% # transposition
+  as.data.frame() %>% # la transposition avais fait perdre la classe dataframe
+  rownames_to_column("Mois") %>% # les mois sont mis dans une colonne, puis
+  mutate(Mois = fct_inorder(Mois)) %>% # on les fige dans l'ordre chronologique
+  ggplot(aes(x = Mois,
+             y = `Debits (m3/s)`)) +
+      geom_bar(stat = "identity",
+               fill = "#54b5c5") +
+      labs(x = "", y = "Débit (m3/s)", title = libelle_ma_station) +
+  geom_hline(aes(yintercept = dern_obs$debit, linetype = as.factor(dern_obs$debit)),
+             col = "darkgreen") +
+    scale_linetype_manual(values = c("dashed"), 
+                        labels = c("Débit actuel"),
+                        name = "")
+```
+
+
 ### Modules interannuels (naturels) - Débits
 
 ```{r}
