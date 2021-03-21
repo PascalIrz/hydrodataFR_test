@@ -70,8 +70,22 @@ syn_data <- syntheses %>%
 ## Graphique débit temps réel
 
 ```{r, class.source = 'fold-show'}
-g_htr <- ggplot(data = htr_data, aes(x = date_obs, y = resultat_obs)) +
+em_long <- syn_data %>% 
+  .[["em"]] %>%
+  purrr::set_names(1:12) %>% 
+  rownames_to_column(var = "variable") %>% 
+  pivot_longer(cols = -variable, names_to = "mois", values_to = "em") %>% 
+  filter(variable == "Debits (m3/s)") %>% 
+  select(-variable)
+  
+data <- htr_data %>% 
+  mutate(mois = lubridate::month(date_obs) %>% as.character) %>%
+  left_join(y = em_long)
+
+g_htr <- ggplot(data = data,
+                aes(x = date_obs, y = resultat_obs / 1000)) +
   geom_line() +
+  geom_bar(aes(y = em), stat = "identity") +
   scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
   scale_y_continuous(limits = c(0, NA)) +
   labs(x = "", y = bquote('Débit')) # légendes des axes
