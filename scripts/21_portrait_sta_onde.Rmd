@@ -1,0 +1,152 @@
+---
+title: "Portrait de station ONDE"
+author: "Pascal Irz"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+# Préparation des données
+
+## Activation des packages
+
+```{r, class.source = 'fold-show'}
+library(tidyverse)
+library(ondetools)
+library(hydrodataFR)
+source(file = "fonctions_mise_en_forme_flextable.R")
+library(flextable)
+library(mapview)
+library(sf)
+```
+
+```{r, eval = FALSE}
+url_onde <- paste0("https://onde.eaufrance.fr/content/",
+                   "t%C3%A9l%C3%A9charger-les-donn%C3%A9es-des-campagnes-par-ann%C3%A9e")
+
+telecharger_fichiers_onde_annuels(url = url_onde, raw_data_dir = 'raw_data')
+
+onde <- assembler_fichiers_onde_annuels_csv(annual_onde_files_dir = "raw_data/fichiers_onde_annuels_zippes") %>% 
+  mutate(Mois = lubridate::ymd(DtRealObservation),
+         Mois = lubridate::month(Mois),
+         Mois = str_pad(Mois, width = 2, side = "left", pad = "0")) %>%
+  filter(TRUE)
+
+unlink("raw_data/fichiers_onde_annuels_zippes", recursive = TRUE)
+```
+
+```{r}
+load(file = "../processed_data/onde.RData")
+```
+
+
+```{r}
+onde <- onde %>%
+  filter(CdDepartement %in% c("29", "22", "35", "56")) %>% 
+  gerer_les_campagnes()
+```
+
+
+```{r}
+stations_onde_geo <- creer_couche_geo_stations(onde_df = onde)
+```
+
+```{r}
+assecs <- calculer_assecs_ete(onde_df = onde)
+
+stations_onde_geo <- ajouter_donnees_assecs_aux_stations(stations_geo = stations_onde_geo,
+                                                         assecs_df = assecs) %>% 
+  st_transform(crs = 27572)
+```
+
+```{r}
+mes_couleurs <- c("Ecoulement\nvisible" = "blue",
+          "Ecoulement\nnon visible" = "brown",
+          "Assec" = "red",
+          "Observation\nimpossible" = "grey",
+          "NA" = "grey")
+
+codes_stations <- unique(pull(stations_onde_geo, CdSiteHydro))
+
+onde_ts_mois <- completer_observations_mois_manquants(onde_df = onde,
+                                                      stations = codes_stations)
+```
+
+```{r}
+graphiques <- produire_graph_pour_toutes_les_stations(stations = codes_stations,
+                                                      fonction_graphique = produire_graph_pour_une_station,
+                                                      onde_df = onde_ts_mois,
+                                                      couleurs = mes_couleurs)
+```
+
+```{r, eval=FALSE}
+mapviewOptions(basemaps = c("OpenStreetMap", "OpenTopoMap",
+                            "Esri.WorldShadedRelief", "Esri.WorldImagery"))
+
+produire_carte_dynamique (couche_stations = stations_onde_geo,
+                          popups_stations = graphiques)
+```
+
+```{r}
+sta_data <- onde %>% 
+  select(-(CdCommune:NomCircAdminBassin), -(ProjCoordSiteHydro:RsObservationNat)) %>% 
+  unique()
+```
+
+```{r}
+sta_data %>% 
+  DT::datatable()
+```
+
+```{r}
+ma_station <- "J0210001"
+libelle_ma_station <- sta_data %>% 
+  filter(CdSiteHydro == ma_station) %>% 
+  pull(LbSiteHydro)
+```
+
+Station : `r libelle_ma_station` (`r ma_station`)
+
+```{r}
+ma_sta_data <- sta_data %>% 
+  filter(CdSiteHydro == ma_station) %>% 
+  flextable %>%
+  mef
+
+ma_sta_data
+```
+
+
+
+
+
+```{r}
+extraire_site_id_du_graphique <- function(graphique)
+  
+{
+  
+  graphique %>% 
+  .[["data"]] %>%
+  .[["CdSiteHydro"]] %>% 
+  .[1]
+  
+}
+
+noms_graphiques <- map(.x = graphiques,
+                       .f = extraire_site_id_du_graphique) %>% 
+  unlist()
+
+names(graphiques) <- noms_graphiques
+```
+
+```{r}
+graphiques[[ma_station]]
+```
+

@@ -163,6 +163,7 @@ syn_data$em %>%
   rownames_to_column("Variable") %>% 
   flextable() %>% 
   mef() %>% 
+  vline(j = c('Variable'), part = "all") %>% 
   align(j = 1, align = "left")
 ```
 ### Modules interannuels (naturels) - Débits
@@ -179,7 +180,7 @@ syn_data$mi %>%
   color_est(couleur = couleur_estimations) %>% 
   add_header_row(colwidths = c(1, 3, 3, 3), values = c("", "Quinquennale sèche", "Médiane", "Quinquennale humide")) %>% 
   mef() %>% 
-  vline(j = c('Quinquennale seche max', 'Mediane max'), part = "all") %>% 
+  vline(j = c('Variable', 'Quinquennale seche max', 'Mediane max'), part = "all") %>% 
   align(j = 1, align = "left", part = "all")
 ```
 
@@ -196,6 +197,7 @@ syn_data$mm %>%
   color_est(couleur = couleur_estimations) %>% 
   add_header_row(colwidths = c(1, 3), values = c("", "Module (moyenne)")) %>% 
   mef() %>% 
+  vline(j = c('Variable'), part = "all") %>% 
   align(j = 1, align = "left", part = "all")
 ```
 
@@ -203,17 +205,17 @@ syn_data$mm %>%
 
 ```{r}
 syn_data$be %>% 
-  rownames_to_column("Période de retour") %>% 
+  rownames_to_column("Periode de retour") %>% 
   flextable() %>% 
   set_header_labels(
-    `Période de retour` = "Période de retour",
+    `Periode de retour` = "Période de retour",
     `VCN3 (m3/s) est` = "est.", `VCN3 (m3/s) min` = "min.", `VCN3 (m3/s) max` = "max.",
     `VCN10 (m3/s) est` = "est.", `VCN10 (m3/s) min` = "min.", `VCN10 (m3/s) max` = "max.",
     `QMNA (m3/s) est` = "est.", `QMNA (m3/s) min` = "min.", `QMNA (m3/s) max` = "max.") %>% 
   color_est(couleur = couleur_estimations) %>% 
   add_header_row(colwidths = c(1, 3, 3, 3), values = c("", "VCN3", "VCN10", "QMNA")) %>% 
-  mef() %>% 
-  vline(j = c('VCN3 (m3/s) max', 'VCN10 (m3/s) max'), part = "all") %>% 
+  mef() %>%
+  vline(j = c('Periode de retour', 'VCN3 (m3/s) max', 'VCN10 (m3/s) max'), part = "all") %>% 
   align(j = 1, align = "left", part = "all")
 ```
 
@@ -223,15 +225,17 @@ syn_data$be %>%
 syn_data$be2 %>% 
   rownames_to_column("Statistique") %>% 
   flextable() %>% 
-  mef()
+  mef() %>% 
+  vline(j = c('Statistique'), part = "all")
 ```
 
 ### Crues - Xo, Gradex
 
 ```{r}
 syn_data$cr %>% 
-  rownames_to_column("Méthode") %>% 
+  rownames_to_column("Methode") %>% 
   flextable() %>% 
+  vline(j = "Methode", part = "all") %>% 
   mef()
 ```
 
@@ -239,16 +243,16 @@ syn_data$cr %>%
 
 ```{r}
 syn_data$cr2 %>% 
-  rownames_to_column("Période de retour") %>% 
+  rownames_to_column("Periode de retour") %>% 
   flextable() %>% 
   set_header_labels(
-    `Période de retour` = "Période de retour",
+    `Periode de retour` = "Période de retour",
     `QJ (m3/s) est` = "est.", `QJ (m3/s) min` = "min.", `QJ (m3/s) max` = "max.",
     `QIX (m3/s) est` = "est.", `QIX (m3/s) min` = "min.", `QIX (m3/s) max` = "max.") %>% 
   color_est(couleur = couleur_estimations) %>% 
   add_header_row(colwidths = c(1, 3, 3), values = c("", "Qj", "QIX")) %>% 
   mef() %>% 
-  vline(j = c('QJ (m3/s) max'), part = "all") %>% 
+  vline(j = c('Periode de retour', 'QJ (m3/s) max'), part = "all") %>% 
   align(j = 1, align = "left", part = "all")
 
 ```
@@ -260,12 +264,13 @@ noms_colonnes <- syn_data$dc %>%
   colnames() %>% 
   str_sub(start = 3)
 
-noms_colonnes <- c("Fréquence", noms_colonnes)
+noms_colonnes <- c("Frequence", noms_colonnes)
 
 syn_data$dc %>% 
   rownames_to_column("Variable") %>% 
   purrr::set_names(noms_colonnes) %>% 
   flextable() %>% 
+  vline(j = c('Frequence'), part = "all") %>% 
   mef()
 ```
 
