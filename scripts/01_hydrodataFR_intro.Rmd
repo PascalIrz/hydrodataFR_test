@@ -22,6 +22,13 @@ knitr::opts_chunk$set(
 
 Le `package {hydrodataFR}` propose une palette d'outils pour faciliter l'exploitation des données de la [banque HYDRO](http://hydro.eaufrance.fr/).
 
+Il permet déjà de :
+
+- Collecter des caractéristiques des stations hydrométriques (cf. ci-dessous).
+- [Collecter et traiter les données hydrométriques en temps réel](https://rpubs.com/kamoke/735781)
+- [Collecter et traiter les synthèses statistiques sur les stations](https://rpubs.com/kamoke/735781), dont les QMNA5, module, débits de crue, etc.
+
+
 # Installation
 
 ## Configuration R et RStudio

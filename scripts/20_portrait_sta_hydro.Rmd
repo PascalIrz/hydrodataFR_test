@@ -31,9 +31,9 @@ library(mapview)
 ## Téléchargement des débits en temps réel
 
 ```{r, class.source = 'fold-show'}
-ma_station <- "J0121510"
+ma_sh <- "J0121510"
 
-htr_data <- bh_htr(stations_id = ma_station,
+debit_tr <- bh_htr(stations_id = ma_sh,
                    grandeur_hydro = "Q") %>% 
   mutate(date_obs = lubridate::ymd_hms(date_obs), # format de la date
          debit = resultat_obs / 1000) %>%  # débits en m3/s
@@ -45,10 +45,10 @@ htr_data <- bh_htr(stations_id = ma_station,
 ## Téléchargement caractéristiques station
 
 ```{r, class.source = 'fold-show'}
-sta_data <- bh_sta_data(code_site = ma_station)
+sh_data <- bh_sta_data(code_site = ma_sh)
 
-libelle_ma_station <- sta_data %>% 
-  filter(code_site == ma_station) %>% 
+libelle_ma_sh <- sh_data %>% 
+  filter(code_site == ma_sh) %>% 
   pull(libelle_site)
 ```
 
@@ -59,20 +59,32 @@ Ces données ont été téléchargées et mises en forme auparavant (cf ....).
 ```{r, class.source = 'fold-show'}
 load(file = "../processed_data/syntheses.RData")
 
-syn_data <- syntheses %>% 
-  .[[ma_station]]
-
-libelle_station <- sta_data$libelle_site
+sh_syn_data <- syntheses %>% 
+  .[[ma_sh]]
 ```
 
 # Constitution des éléments du portrait
 
-## Débit temps réel
-
-`r libelle_station` : visualisation des premières lignes sur quelques colonnes.
+## Palette de couleurs
 
 ```{r}
-htr_data %>% 
+# Pour les graphiques
+coul_em <- "#54b5c5" # ecoulements mensuels
+coul_QMNA5 <- "red"
+coul_module <- "brown"
+coul_actuel <- "darkgreen" # temps réel
+
+# Pour les tableaux
+coul_estimations <- "red"
+```
+
+
+## Débit temps réel
+
+`r libelle_ma_sh` : visualisation des premières lignes sur quelques colonnes.
+
+```{r}
+debit_tr %>% 
   head() %>%
   select(code_site, code_station, grandeur_hydro, date_obs, debit) %>% 
   flextable() %>% 
@@ -80,7 +92,7 @@ htr_data %>%
 ```
 
 ```{r}
-dern_obs <- htr_data %>% 
+dern_obs <- debit_tr %>% 
   filter(date_obs == max(date_obs, na.rm = TRUE))
 
 # flexdashboard::valueBox(value = dern_obs$debit,
@@ -95,32 +107,36 @@ La courbe indique les valeurs récentes de débit et les barres bleu ciel les d�
 
 
 ```{r}
-em_long <- syn_data %>% 
+# Besoin pour ggplot de mettre le tableau des em avec les valeurs en colonnes (format long)
+em_long <- sh_syn_data %>% 
   .[["em"]] %>%
   purrr::set_names(1:12) %>% 
   rownames_to_column(var = "variable") %>% 
   pivot_longer(cols = -variable, names_to = "mois", values_to = "em") %>% 
   filter(variable == "Debits (m3/s)") %>% 
   select(-variable)
-  
-data <- htr_data %>% 
+
+# Ajout des em au tableau des débits temps réel
+data <- debit_tr %>% 
   mutate(mois = lubridate::month(date_obs) %>% as.character) %>%
   left_join(y = em_long)
 
+# Tableau qui va servir à indiquer module et QMNA5
 hline_data <- data.frame(
-  y = c(syn_data$mm$`Module (moyenne) est`,
-        syn_data$be %>% .["Quinquennale seche",] %>% pull(`QMNA (m3/s) est`)),
+  y = c(sh_syn_data$mm$`Module (moyenne) est`,
+        sh_syn_data$be %>% .["Quinquennale seche",] %>% pull(`QMNA (m3/s) est`)),
   type = c("dashed", "solid"),
   couleur = c("brown", "red")
 )
 
+# Constitution du graphique
 g_htr <- ggplot(data = data,
                 aes(x = date_obs, y = debit)) +
-  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.15, fill = "#54b5c5") +
-    geom_line() +
+  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.050, fill = coul_em) +
+    geom_line(col = coul_actuel) +
   scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
   scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "", y = bquote('Débit ('*m^3/s*')'), title = libelle_station) + # légendes
+  labs(x = "", y = bquote('Débit ('*m^3/s*')'), title = libelle_ma_sh) + # légendes
   geom_hline(data = hline_data, aes(yintercept = y, col = couleur, linetype = type)) +
   scale_colour_manual(values = c("brown", "red"), 
                       labels = c("Module", "QMNA5"),
@@ -128,34 +144,42 @@ g_htr <- ggplot(data = data,
   scale_linetype_manual(values = c("solid", "dashed"), 
                         labels = c("Module", "QMNA5"),
                         name = "Statistique")
-  
+
+# Affichage du graphique 
 g_htr
 ```
 
 ## Caractéristiques de la station
 
 ```{r}
-prov <- sta_data %>% 
+# Comme on a un tableau à 35 colonnes et une lignes, on le transpose
+# Sélection des colonnes à conserver
+prov <- sh_data %>% 
   select(-(type_site:code_projection),
          -code_systeme_alti_site,
          -(statut_site:influence_generale_site),
          -(grandeur_hydro:date_maj_site),
          -(type_contexte_loi_stat_site:geometry))
 
+# Récupération des noms des colonnes qui vont devenir des noms de lignes
 noms_lignes <- colnames(prov)
 
+# Nettoyage de certains champs
 valeurs <- prov %>% 
   as.character() %>% 
   str_remove_all('list\\("') %>% 
   str_remove_all('\\)') %>% 
   str_remove_all('\\"')
 
-t_sta_data <- cbind(noms_lignes, valeurs) %>% 
+# On recolle les noms des lignes et leurs valeurs
+t_sh_data <- cbind(noms_lignes, valeurs) %>% 
   as.data.frame()
 
-t_sta_data  %>% 
+# Présentation du tableau
+t_sh_data  %>% 
   flextable() %>% 
   mef() %>% 
+  autofit() %>% 
   align(align = "left", part = "all")
 ```
 
@@ -169,7 +193,7 @@ couleur_estimations <- "red"
 ### Ecoulements mensuels
 
 ```{r}
-syn_data$em %>% 
+sh_syn_data$em %>% 
   rownames_to_column("Variable") %>% 
   flextable() %>% 
   mef() %>% 
@@ -182,7 +206,7 @@ date_max <- dern_obs %>%
   format("%d/%m/%Y")
 
 bh_sy_ind_sta(syntheses = syntheses,
-              sta_id = ma_station,
+              sta_id = ma_sh,
               indicateur = "em") %>% 
   t() %>% # transposition
   as.data.frame() %>% # la transposition avais fait perdre la classe dataframe
@@ -191,12 +215,12 @@ bh_sy_ind_sta(syntheses = syntheses,
   ggplot(aes(x = Mois,
              y = `Debits (m3/s)`)) +
       geom_bar(stat = "identity",
-               fill = "#54b5c5") +
-      labs(x = "", y = "Débit (m3/s)", title = libelle_ma_station) +
+               fill = coul_em) +
+      labs(x = "", y = "Débit (m3/s)", title = libelle_ma_sh) +
   geom_hline(aes(yintercept = dern_obs$debit, linetype = as.factor(dern_obs$debit)),
-             col = "darkgreen") +
+             col = coul_actuel) +
     scale_linetype_manual(values = c("dashed"), 
-                          labels = paste0("Débit au ",
+                          labels = paste0("Débit au \n",
                                           date_max),
                           name = "") +
   geom_vline(xintercept = dern_obs$date_obs %>%
@@ -206,14 +230,14 @@ bh_sy_ind_sta(syntheses = syntheses,
                             magrittr::add(dern_obs$date_obs %>%
                                    lubridate::month()),
              linetype = "dashed",
-             col = "darkgreen")
+             col = coul_actuel)
 ```
 
 
 ### Modules interannuels (naturels) - Débits
 
 ```{r}
-syn_data$mi %>% 
+sh_syn_data$mi %>% 
   rownames_to_column("Variable") %>% 
   flextable() %>% 
   set_header_labels(
@@ -232,7 +256,7 @@ syn_data$mi %>%
 ### Modules interannuels (naturels) - Moyenne
 
 ```{r}
-syn_data$mm %>% 
+sh_syn_data$mm %>% 
   rownames_to_column("Variable") %>% 
   flextable() %>% 
   set_header_labels(
@@ -248,7 +272,7 @@ syn_data$mm %>%
 ### Basses eaux - Biennale et quinquennale
 
 ```{r}
-syn_data$be %>% 
+sh_syn_data$be %>% 
   rownames_to_column("Periode de retour") %>% 
   flextable() %>% 
   set_header_labels(
@@ -266,7 +290,7 @@ syn_data$be %>%
 ### Basses eaux - Moyenne et écart-type
 
 ```{r}
-syn_data$be2 %>% 
+sh_syn_data$be2 %>% 
   rownames_to_column("Statistique") %>% 
   flextable() %>% 
   mef() %>% 
@@ -276,7 +300,7 @@ syn_data$be2 %>%
 ### Crues - Xo, Gradex
 
 ```{r}
-syn_data$cr %>% 
+sh_syn_data$cr %>% 
   rownames_to_column("Methode") %>% 
   flextable() %>% 
   set_header_labels(`Methode` = "Méthode") %>% 
@@ -287,7 +311,7 @@ syn_data$cr %>%
 ### Crues - Périodes de retour
 
 ```{r}
-syn_data$cr2 %>% 
+sh_syn_data$cr2 %>% 
   rownames_to_column("Periode de retour") %>% 
   flextable() %>% 
   set_header_labels(
@@ -305,30 +329,30 @@ syn_data$cr2 %>%
 ### Débits classés
 
 ```{r}
-noms_colonnes <- syn_data$dc %>% 
+noms_colonnes <- sh_syn_data$dc %>% 
   colnames() %>% 
   str_sub(start = 3)
 
 noms_colonnes <- c("Frequence", noms_colonnes)
 
-syn_data$dc %>% 
+sh_syn_data$dc %>% 
   rownames_to_column("Variable") %>% 
   purrr::set_names(noms_colonnes) %>% 
   flextable() %>% 
   set_header_labels(`Frequence` = "Fréquence") %>% 
   mef() %>% 
   vline(j = c('Frequence'), part = "all")
+```
 
-## Localisation
 
 ```{r}
-geo_sta <- sta_data %>% 
+geo_sta <- sh_data %>% 
   sf::st_as_sf(coords = c("coordonnee_x_site", "coordonnee_y_site"), crs = 2154)
 
 # m <- mapview(geo_sta)
 # 
-# m@map %>% leaflet::setView(lng = sta_data[1, "longitude_site"],
-#                            lat = sta_data[1, "latitude_site"],
+# m@map %>% leaflet::setView(lng = sh_data[1, "longitude_site"],
+#                            lat = sh_data[1, "latitude_site"],
 #                            zoom = 8)
 ```
 
