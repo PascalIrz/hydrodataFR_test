@@ -91,9 +91,8 @@ dern_obs <- htr_data %>%
 
 Dernière observation de débit le `r dern_obs$date_obs %>% format('%d/%m/%Y')` à `r dern_obs$date_obs %>% lubridate::hour()`h`r dern_obs$date_obs %>% lubridate::minute()` : `r dern_obs$debit` $m^3/s$.
 
-La courbe indique les valeurs récentes de débit, les barres bleu ciel les débits mensuels moyens issus des synthèses de la station.
+La courbe indique les valeurs récentes de débit et les barres bleu ciel les débits mensuels moyens issus des synthèses de la station.
 
-En marron pointillé le module interannuel et en rouge continu le $QMNA_5$.
 
 ```{r}
 em_long <- syn_data %>% 
@@ -178,6 +177,10 @@ syn_data$em %>%
   align(j = 1, align = "left")
 ```
 ```{r}
+date_max <- dern_obs %>% 
+  pull(date_obs) %>% 
+  format("%d/%m/%Y")
+
 bh_sy_ind_sta(syntheses = syntheses,
               sta_id = ma_station,
               indicateur = "em") %>% 
@@ -193,8 +196,17 @@ bh_sy_ind_sta(syntheses = syntheses,
   geom_hline(aes(yintercept = dern_obs$debit, linetype = as.factor(dern_obs$debit)),
              col = "darkgreen") +
     scale_linetype_manual(values = c("dashed"), 
-                        labels = c("Débit actuel"),
-                        name = "")
+                          labels = paste0("Débit au ",
+                                          date_max),
+                          name = "") +
+  geom_vline(xintercept = dern_obs$date_obs %>%
+                            lubridate::day() %>% 
+                            magrittr::subtract(15) %>% 
+                            magrittr::divide_by(30) %>% 
+                            magrittr::add(dern_obs$date_obs %>%
+                                   lubridate::month()),
+             linetype = "dashed",
+             col = "darkgreen")
 ```
 
 
@@ -267,8 +279,9 @@ syn_data$be2 %>%
 syn_data$cr %>% 
   rownames_to_column("Methode") %>% 
   flextable() %>% 
-  vline(j = "Methode", part = "all") %>% 
-  mef()
+  set_header_labels(`Methode` = "Méthode") %>% 
+  mef() %>% 
+  vline(j = c('Methode'), part = "all")
 ```
 
 ### Crues - Périodes de retour
@@ -302,9 +315,9 @@ syn_data$dc %>%
   rownames_to_column("Variable") %>% 
   purrr::set_names(noms_colonnes) %>% 
   flextable() %>% 
-  vline(j = c('Frequence'), part = "all") %>% 
-  mef()
-```
+  set_header_labels(`Frequence` = "Fréquence") %>% 
+  mef() %>% 
+  vline(j = c('Frequence'), part = "all")
 
 ## Localisation
 
