@@ -49,15 +49,15 @@ Dans ce cas des codes erreurs dans la gamme des 500, c'est le serveur qui n'a pa
 Pour collecter les données associées à une station dont on connaît l'identifiant, on utilise la fonction `bh_htr()` qui, par défaut, renvoie les données de débit et de hauteur.
 
 ```{r}
-ma_station <- "J0121510"
-data_sta <- bh_htr(stations_id = ma_station)
+ma_sh <- "J0121510"
+data_sta <- bh_htr(stations_id = ma_sh)
 ```
 
 On peut aussi avoir besoin du débit (mesure = "Q") et non de la hauteur d'eau (mesure = "H") :
 
 ```{r, eval = FALSE}
-data_sta <- bh_htr(stations_id = ma_station,
-                            grandeur_hydro = "Q")
+data_sta <- bh_htr(stations_id = ma_sh,
+                   grandeur_hydro = "Q")
 ```
 
 Par défaut, la fonction renvoie les 20 000 dernières données.
@@ -93,21 +93,13 @@ ggplot(data = data_sta, aes(x = date_obs, y = resultat_obs / 1000)) +
 En reprenant la sélection géographique rectangulaire précédente des stations, on peut collecter les identifiants des stations. On peut aussi procéder à partir du département :
 
 ```{r}
-stations <- bh_sta_data(code_departement = 22)
-```
-
-Les identifiants de ces stations sont les suivants :
-
-```{r}
-stations_id <- stations %>%
-  pull(code_site)  %>% 
-  unique()
+shs <- bh_sta_data(code_departement = 22)
 ```
 
 Où sont-elles situées ?
 
 ```{r, fig.align = 'center', fig.width = 6, fig.height = 6}
-stations %>%
+shs %>%
   sf::st_as_sf(coords = c("longitude_site", "latitude_site"),
                crs = 4326) %>%
   mapview::mapview(map.types = "OpenStreetMap")
@@ -121,16 +113,16 @@ La fonction `bh_htr()` permet de contourner certaines des limitations de l'API p
 Pour l'utiliser, il faut les identifiants des stations regroupés en un vecteur.
 
 ```{r}
-stations_id <- stations %>%
+shs_id <- shs %>%
   pull(code_site) %>%
   unique
 ```
 
-Vérification du contenu de l'objet `stations_id` :
+Vérification du contenu de l'objet `shs_id` :
 
 ```{r}
-length(stations_id) # nb d'élements
-class(stations_id) # classe du vecteur
+length(shs_id) # nb d'élements
+class(shs_id) # classe du vecteur
 ```
 
 Chargement des données.
@@ -143,12 +135,12 @@ load(file = "../processed_data/debits_plusieurs_stations.RData")
 
 
 ```{r, eval = FALSE}
-debits_plusieurs_stations <-
-  bh_htr(stations_id = stations_id) %>%
+debits_plusieurs_stations <- bh_htr(stations_id = shs_id) %>%
   mutate(date_obs = lubridate::ymd_hms(date_obs)) %>%  # format de la date
-  left_join(y = stations %>%
+  left_join(y = shs %>%
               select(code_site, libelle_site))
 ```
+
 Combien de données par station ?
 
 ```{r, fig.width = 4, fig.align = 'center'}
@@ -161,12 +153,12 @@ nb_donnees_par_sta <-
 DT::datatable(nb_donnees_par_sta)
 ```
 
-Il apparaît donc que sur les `r length(stations_id)` stations initialement sélectionnées, seulement `r nrow(nb_donnees_par_sta)` fournissent des données sur la période considérée.
+Il apparaît donc que sur les `r length(shs_id)` stations initialement sélectionnées, seulement `r nrow(nb_donnees_par_sta)` fournissent des données sur la période considérée.
 
 ### Représentation graphique
 
 ```{r, fig.width = 8, fig.height = 12}
-ggplot(data = debits_plusieurs_stations, aes(x = date_obs, y = resultat_obs)) +
+graphique <- ggplot(data = debits_plusieurs_stations, aes(x = date_obs, y = resultat_obs)) +
   geom_line() +
   scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
   labs(x = "", y = "Débit") + # légendes des axes
@@ -175,6 +167,8 @@ ggplot(data = debits_plusieurs_stations, aes(x = date_obs, y = resultat_obs)) +
               ncol = 4) + # nb de colonnes
   coord_cartesian(ylim = c(0, NA)) + # l'axe des débits commence à zéro
   theme(text = element_text(size = 9)) # taille de la police
+
+graphique
 ```
 
 

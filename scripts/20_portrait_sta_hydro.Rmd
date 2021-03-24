@@ -33,7 +33,7 @@ library(mapview)
 ```{r, class.source = 'fold-show'}
 ma_sh <- "J0121510"
 
-debit_tr <- bh_htr(stations_id = ma_sh,
+sh_debit <- bh_htr(stations_id = ma_sh,
                    grandeur_hydro = "Q") %>% 
   mutate(date_obs = lubridate::ymd_hms(date_obs), # format de la date
          debit = resultat_obs / 1000) %>%  # débits en m3/s
@@ -70,8 +70,6 @@ sh_syn_data <- syntheses %>%
 ```{r}
 # Pour les graphiques
 coul_em <- "#54b5c5" # ecoulements mensuels
-coul_QMNA5 <- "red"
-coul_module <- "brown"
 coul_actuel <- "darkgreen" # temps réel
 
 # Pour les tableaux
@@ -84,7 +82,7 @@ coul_estimations <- "red"
 `r libelle_ma_sh` : visualisation des premières lignes sur quelques colonnes.
 
 ```{r}
-debit_tr %>% 
+sh_debit %>% 
   head() %>%
   select(code_site, code_station, grandeur_hydro, date_obs, debit) %>% 
   flextable() %>% 
@@ -92,62 +90,26 @@ debit_tr %>%
 ```
 
 ```{r}
-dern_obs <- debit_tr %>% 
+dern_obs <- sh_debit %>% 
   filter(date_obs == max(date_obs, na.rm = TRUE))
-
-# flexdashboard::valueBox(value = dern_obs$debit,
-#                         caption = "m3/s",
-#                         icon = "fa-pencil")
-  
 ```
 
 Dernière observation de débit le `r dern_obs$date_obs %>% format('%d/%m/%Y')` à `r dern_obs$date_obs %>% lubridate::hour()`h`r dern_obs$date_obs %>% lubridate::minute()` : `r dern_obs$debit` $m^3/s$.
 
 La courbe indique les valeurs récentes de débit et les barres bleu ciel les débits mensuels moyens issus des synthèses de la station.
 
+Comme la fonction `bh_htr_grapher()` retourne un graphique `ggplot2`, on peut le modifier pour l'améliorer en rajoutant des commandes enchaînées par l'opérateur `+`, par exemple ci-dessous pour obtenir une jolie légende de l'axe des ordonnées. 
 
 ```{r}
-# Besoin pour ggplot de mettre le tableau des em avec les valeurs en colonnes (format long)
-em_long <- sh_syn_data %>% 
-  .[["em"]] %>%
-  purrr::set_names(1:12) %>% 
-  rownames_to_column(var = "variable") %>% 
-  pivot_longer(cols = -variable, names_to = "mois", values_to = "em") %>% 
-  filter(variable == "Debits (m3/s)") %>% 
-  select(-variable)
+synthese_ma_sh <- syntheses[ma_sh] %>% 
+  .[[1]]
 
-# Ajout des em au tableau des débits temps réel
-data <- debit_tr %>% 
-  mutate(mois = lubridate::month(date_obs) %>% as.character) %>%
-  left_join(y = em_long)
-
-# Tableau qui va servir à indiquer module et QMNA5
-hline_data <- data.frame(
-  y = c(sh_syn_data$mm$`Module (moyenne) est`,
-        sh_syn_data$be %>% .["Quinquennale seche",] %>% pull(`QMNA (m3/s) est`)),
-  type = c("dashed", "solid"),
-  couleur = c("brown", "red")
-)
-
-# Constitution du graphique
-g_htr <- ggplot(data = data,
-                aes(x = date_obs, y = debit)) +
-  geom_col(aes(y = em), stat = "identity", width = 20000, alpha = 0.050, fill = coul_em) +
-    geom_line(col = coul_actuel) +
-  scale_x_datetime(date_labels = "%d/%m") + # étiquette axe des dates
-  scale_y_continuous(limits = c(0, NA)) +
-  labs(x = "", y = bquote('Débit ('*m^3/s*')'), title = libelle_ma_sh) + # légendes
-  geom_hline(data = hline_data, aes(yintercept = y, col = couleur, linetype = type)) +
-  scale_colour_manual(values = c("brown", "red"), 
-                      labels = c("Module", "QMNA5"),
-                      name = "Statistique") +
-  scale_linetype_manual(values = c("solid", "dashed"), 
-                        labels = c("Module", "QMNA5"),
-                        name = "Statistique")
-
-# Affichage du graphique 
-g_htr
+bh_htr_grapher(debit_sh = sh_debit,
+               synthese_sh = synthese_ma_sh,
+               donnees_sh = sh_data) +
+  labs(y = bquote('Débit ('*m^3/s*')')) # légende de l'axe des ordonnées
 ```
+
 
 ## Caractéristiques de la station
 
@@ -164,7 +126,7 @@ prov <- sh_data %>%
 # Récupération des noms des colonnes qui vont devenir des noms de lignes
 noms_lignes <- colnames(prov)
 
-# Nettoyage de certains champs
+# Nettoyage des champs contenant des listes
 valeurs <- prov %>% 
   as.character() %>% 
   str_remove_all('list\\("') %>% 
@@ -192,6 +154,8 @@ couleur_estimations <- "red"
 
 ### Ecoulements mensuels
 
+Sous forme de tableau :
+
 ```{r}
 sh_syn_data$em %>% 
   rownames_to_column("Variable") %>% 
@@ -200,35 +164,40 @@ sh_syn_data$em %>%
   vline(j = c('Variable'), part = "all") %>% 
   align(j = 1, align = "left")
 ```
+
+Graphique :
+
 ```{r}
 date_max <- dern_obs %>% 
   pull(date_obs) %>% 
   format("%d/%m/%Y")
 
-bh_sy_ind_sta(syntheses = syntheses,
-              sta_id = ma_sh,
-              indicateur = "em") %>% 
+prov <- bh_sy_ind_sta(syntheses = syntheses,
+                      sta_id = ma_sh,
+                      indicateur = "em") %>% 
   t() %>% # transposition
   as.data.frame() %>% # la transposition avais fait perdre la classe dataframe
   rownames_to_column("Mois") %>% # les mois sont mis dans une colonne, puis
-  mutate(Mois = fct_inorder(Mois)) %>% # on les fige dans l'ordre chronologique
-  ggplot(aes(x = Mois,
-             y = `Debits (m3/s)`)) +
-      geom_bar(stat = "identity",
-               fill = coul_em) +
-      labs(x = "", y = "Débit (m3/s)", title = libelle_ma_sh) +
+  mutate(Mois = fct_inorder(Mois)) # on les fige dans l'ordre chronologique
+
+ggplot(data = prov, aes(x = Mois, y = `Debits (m3/s)`)) +
+  geom_bar(stat = "identity",
+           fill = coul_em) +
+  labs(x = "",
+       y = bquote('Débit ('*m^3/s*')'),
+       title = libelle_ma_sh) +
   geom_hline(aes(yintercept = dern_obs$debit, linetype = as.factor(dern_obs$debit)),
              col = coul_actuel) +
-    scale_linetype_manual(values = c("dashed"), 
-                          labels = paste0("Débit au \n",
-                                          date_max),
-                          name = "") +
+  scale_linetype_manual(values = c("dashed"), 
+                        labels = paste0("Débit au \n",
+                                        date_max),
+                        name = "") +
   geom_vline(xintercept = dern_obs$date_obs %>%
-                            lubridate::day() %>% 
-                            magrittr::subtract(15) %>% 
-                            magrittr::divide_by(30) %>% 
-                            magrittr::add(dern_obs$date_obs %>%
-                                   lubridate::month()),
+               lubridate::day() %>% 
+               magrittr::subtract(15) %>% 
+               magrittr::divide_by(30) %>% 
+               magrittr::add(dern_obs$date_obs %>%
+                               lubridate::month()),
              linetype = "dashed",
              col = coul_actuel)
 ```
@@ -356,34 +325,65 @@ geo_sta <- sh_data %>%
 #                            zoom = 8)
 ```
 
-## Station(s) hydro en aval ?
+## Station(s) ONDE en amont ?
+
+### Bassins versants des stations HYDRO
+
+Cette couche a été fournie par la Dreal Bretagne.
 
 ```{r}
-bv_shydro <- sf::read_sf("../raw_data/bv_stations_hydro_bretagnoide.gpkg")
+bv_sh <- sf::read_sf("../raw_data/bv_stations_hydro_bretagnoide.gpkg") %>% 
+  rename(code_sh = codehydro,
+         lb_sh = nomhydro) %>% 
+  filter(code_sh == ma_sh)
+```
 
-codes_sta_hydr <- sf::st_join(geo_sta, bv_shydro) %>% 
-  pull(codehydro)
+### Stations ONDE
 
-bv_shydro <- bv_shydro %>% 
-  filter(codehydro %in% codes_sta_hydr)
+```{r}
+load(file = "../processed_data/onde.RData")
 
-if (nrow(bv_shydro) > 1)
-  
-{
-  
-  bv_shydro <- bv_shydro %>% 
-    filter(sbvcartesi == min(sbvcartesi))
-}
+so_geo <- onde %>%
+  filter(CdDepartement %in% c("29", "22", "35", "56")) %>% 
+  select(code_so = CdSiteHydro,
+         lb_so = LbSiteHydro,
+         CoordXSiteHydro,
+         CoordYSiteHydro) %>% 
+  unique() %>%
+  sf::st_as_sf(coords = c("CoordXSiteHydro", "CoordYSiteHydro"), crs = 2154)
+```
 
-shydro_geo <- bv_shydro %>% 
-  sf::st_drop_geometry() %>% 
-  sf::st_as_sf(coords = c("xl93", "yl93"), crs = 2154)
+```{r}
+so_codes <- sf::st_join(so_geo, bv_sh) %>% 
+  filter(!is.na(code_sh)) %>% 
+  pull(code_so)
+```
 
+```{r}
+onde %>% 
+  filter(CdSiteHydro %in% so_codes) %>% 
+  select(so_code = CdSiteHydro,
+         so_libelle = LbSiteHydro,
+         so_cours_eau = NomEntiteHydrographique,
+         so_commune = LbCommune) %>% 
+  unique() %>% 
+  flextable() %>% 
+  mef()
+```
+
+```{r}
+stations_onde <- so_geo %>%
+  filter(code_so %in% so_codes)
+```
+
+
+```{r}
 mapviewOptions(basemaps = c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap"))
-
-mapview(bv_shydro) +
-  mapview(shydro_geo, col.regions = "red") +
-  mapview(geo_sta)
+ 
+mapview(bv_sh) +
+   mapview(stations_onde,
+           col.regions = "red")
+#   mapview(geo_sta)
 ```
 
 
