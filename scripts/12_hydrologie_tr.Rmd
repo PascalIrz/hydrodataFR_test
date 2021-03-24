@@ -1,7 +1,7 @@
 ---
 title: "Package {hydrodataFR} - Hydrologie temps réel"
 author: "Pascal Irz"
-date: "`r Sys.Date()`"
+date: "Le `r format(Sys.time(), '%d %B %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Package {Package {hydrodataFR} - Hydrologie temps réel}
@@ -18,13 +18,18 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Eléments de contexte
+
+Ce tuto est une des briques pour guider l'utilisateur dans l'usage du package [{hydrodataFR}](https://github.com/PascalIrz/hydrodataFR) dont les grandes lignes sont décrites dans un [article introductif](https://rpubs.com/kamoke/741350).
+
 ```{r}
 library(hydrodataFR)
 library(tidyverse)
 ```
 
+## Accès aux données
 
-Ces données de hauteur d'eau et de débit sont mises à disposition par le module [Opérations sur les niveaux et les débits des cours d'eau en temps réel](https://hubeau.eaufrance.fr/page/api-hydrometrie#/hydrometrie/observations) de l'API Hub'Eau - Hydrométrie. Elles se rapportent à la station de mesure.
+Les données de hauteur d'eau et de débit sont mises à disposition par le module [Opérations sur les niveaux et les débits des cours d'eau en temps réel](https://hubeau.eaufrance.fr/page/api-hydrometrie#/hydrometrie/observations) de l'API Hub'Eau - Hydrométrie. Elles se rapportent à la station de mesure.
 
 L'API, pour les données en temps réel, comprend plusieurs limitations : 
 

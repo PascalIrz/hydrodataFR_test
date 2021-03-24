@@ -1,7 +1,7 @@
 ---
 title: "Package {hydrodataFR} - Synthèses"
 author: "Pascal Irz"
-date: "`r Sys.Date()`"
+date: "Le `r format(Sys.time(), '%d %B %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Package {hydrodataFR} - Synthèses}
@@ -18,7 +18,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Objectif du module
+## Eléments de contexte
+
+Ce tuto est une des briques pour guider l'utilisateur dans l'usage du package [{hydrodataFR}](https://github.com/PascalIrz/hydrodataFR) dont les grandes lignes sont décrites dans un [article introductif](https://rpubs.com/kamoke/741350).
+
+
+## Objectif du module
 
 Ce tuto vise à présenter comment exploiter les données de synthèse qui sont téléchargeables depuis la banque HYDRO. Cette exploitation n'est pas évidente en l'absence d'API qui permettrait de collecter directement les informations dont on a besoin. De telles API existent pour les [mesures hydrométriques en temps réel](https://hubeau.eaufrance.fr/page/api-hydrometrie) ou la [piézométrie](https://hubeau.eaufrance.fr/page/api-piezometrie), mais pas (encore) pour les données de synthèses sur les stations hydrométriques.
 
@@ -34,15 +39,8 @@ Ce qui n'est pas simple à utiliser. Par exemple, à l'échelle d'une région si
 
 **Ce tuto a pour ambition de rendre le moins fastidieuse possible l'exploitation de ces données téléchargées.**
 
-# Pré-requis
 
-La machine de l'utilisateur est supposée configurée avec les outils nécessaires pour compiler des *packages* R. Ce qui permet d'installer le package {hydrodataFR}.
-
-```{r, eval = FALSE}
-devtools::install_github("pascalirz/hydrodataFR")
-```
-
-# Chargement des packages
+## Chargement des packages
 
 ```{r, message = FALSE}
 library(tidyverse)

@@ -1,7 +1,7 @@
 ---
 title: "Package {hydrodataFR} - Introduction"
 author: "Pascal Irz"
-date: "`r Sys.Date()`"
+date: "Le `r format(Sys.time(), '%d %B %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Package {hydrodataFR} - Introduction}
@@ -25,15 +25,15 @@ Le `package {hydrodataFR}` propose une palette d'outils pour faciliter l'exploit
 Il permet déjà de :
 
 - Collecter des caractéristiques des stations hydrométriques (cf. ci-dessous).
+- [Collecter et traiter les synthèses statistiques sur les stations](https://rpubs.com/kamoke/735781), dont les $QMNA_5$, module, débits de crue, etc.
 - [Collecter et traiter les données hydrométriques en temps réel](https://rpubs.com/kamoke/735781)
-- [Collecter et traiter les synthèses statistiques sur les stations](https://rpubs.com/kamoke/735781), dont les QMNA5, module, débits de crue, etc.
 
 
 # Installation
 
-## Configuration R et RStudio
+## Pré-requis
 
-Se reporter à la description donnée au début du [tuto sur l'importation des données avec le package {aspe}](https://rpubs.com/kamoke/713407).
+La machine de l'utilisateur est supposée configurée avec les outils nécessaires pour compiler des *packages* R. Ce qui permet d'installer le package {hydrodataFR}. Pour les détails de la configuration R et RStudio, se reporter à la description donnée au début du [tuto sur l'importation des données avec le package {aspe}](https://rpubs.com/kamoke/713407).
 
 ## Téléchargement du package
 

@@ -1,7 +1,7 @@
 ---
 title: "Portrait de station hydro"
 author: "Pascal Irz"
-date: "`r Sys.Date()`"
+date: "Le `r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
     code_folding: hide
@@ -54,7 +54,7 @@ libelle_ma_sh <- sh_data %>%
 
 ## Chargement données de synthèse
 
-Ces données ont été téléchargées et mises en forme auparavant (cf ....).
+Ces données ont été [téléchargées et mises en forme auparavant](https://rpubs.com/kamoke/727484).
 
 ```{r, class.source = 'fold-show'}
 load(file = "../processed_data/syntheses.RData")
